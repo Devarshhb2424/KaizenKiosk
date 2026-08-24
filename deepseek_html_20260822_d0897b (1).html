@@ -588,7 +588,6 @@
   const TEXT_SCALE_FACTORS = [1, 1.15, 1.3];
   let resetTimer = null;
   let resetInterval = null;
-  let ttsAudio = null;
 
   function t(key){
     const v = T[state.lang][key];
@@ -625,6 +624,7 @@
   }
 
   function startResetCountdown(seconds, barId, noteId){
+    clearResetTimer();
     let remaining = seconds;
     const bar = el(barId), note = el(noteId);
     resetInterval = setInterval(()=>{
@@ -639,7 +639,7 @@
   }
 
   function resetAll(){
-    if (ttsAudio) { ttsAudio.pause(); ttsAudio.currentTime = 0; }
+    if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
     const keepScale = state.textScaleIdx;
     const keepUnlock = state.audioUnlocked;
     state = {
@@ -661,96 +661,57 @@
     }
   }
 
-  // ---- Google TTS with user gesture unlock ----
+  // ---- Web Speech API with user gesture unlock ----
   function unlockAudio() {
     if (state.audioUnlocked) return;
     state.audioUnlocked = true;
-    // Create a silent audio to unlock
-    const silent = new Audio();
-    silent.volume = 0;
-    silent.play().then(() => {
-      // Now we can play TTS
+    if ('speechSynthesis' in window) {
+      const silent = new SpeechSynthesisUtterance('');
+      window.speechSynthesis.speak(silent);
       setTimeout(() => startLanguageAnnouncement(), 200);
-    }).catch(() => {
-      // If silent play fails, try again on next click
-      state.audioUnlocked = false;
-    });
+    }
   }
 
-  function speakWithGoogleTTS(text, lang) {
+  function speak(text, lang, callback) {
     if (!state.audioUnlocked) {
-      // Store the request and try to unlock
       unlockAudio();
-      // Try again after a short delay
       setTimeout(() => {
         if (state.audioUnlocked) {
-          speakWithGoogleTTS(text, lang);
+          speak(text, lang, callback);
         }
       }, 300);
       return;
     }
 
-    if (!ttsAudio) {
-      ttsAudio = document.createElement('audio');
-      ttsAudio.style.display = 'none';
-      document.body.appendChild(ttsAudio);
-    }
-    
-    // Cancel any ongoing playback
-    if (ttsAudio) {
-      ttsAudio.pause();
-      ttsAudio.currentTime = 0;
-    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      
+      utterance.onstart = () => {
+        state.speaking = true;
+        updateSpeechBtn();
+        highlightLangButton(lang);
+      };
+      
+      utterance.onend = () => {
+        state.speaking = false;
+        updateSpeechBtn();
+        clearLangHighlight();
+        if (callback) callback();
+      };
+      
+      utterance.onerror = () => {
+        state.speaking = false;
+        updateSpeechBtn();
+        clearLangHighlight();
+        if (callback) callback();
+      };
 
-    const ttsLang = lang === 'gu-IN' ? 'gu' : lang === 'hi-IN' ? 'hi' : 'en';
-    ttsAudio.src = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${ttsLang}&client=tw-ob`;
-    
-    ttsAudio.onplay = () => {
-      state.speaking = true;
-      updateSpeechBtn();
-      highlightLangButton(lang);
-    };
-    ttsAudio.onended = () => {
-      state.speaking = false;
-      updateSpeechBtn();
-      clearLangHighlight();
-    };
-    ttsAudio.onerror = () => {
-      state.speaking = false;
-      updateSpeechBtn();
-      clearLangHighlight();
-      // Retry once with a small delay
-      if (!ttsAudio.dataset.retried) {
-        ttsAudio.dataset.retried = "true";
-        setTimeout(() => {
-          if (!state.speaking && state.audioUnlocked) {
-            ttsAudio.src = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${ttsLang}&client=tw-ob`;
-            ttsAudio.play().catch(() => {});
-          }
-        }, 500);
-      } else {
-        delete ttsAudio.dataset.retried;
-      }
-    };
-    
-    ttsAudio.play().then(() => {
-      delete ttsAudio.dataset.retried;
-    }).catch((e) => {
-      // If play fails, try to unlock again
-      state.audioUnlocked = false;
-      unlockAudio();
-    });
-  }
-
-  function speak(text, lang) {
-    if (ttsAudio) { 
-      ttsAudio.pause(); 
-      ttsAudio.currentTime = 0; 
-      delete ttsAudio.dataset.retried;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      if (callback) callback();
     }
-    state.speaking = true;
-    updateSpeechBtn();
-    speakWithGoogleTTS(text, lang);
   }
 
   function highlightLangButton(lang) {
@@ -788,22 +749,10 @@
         return;
       }
       const p = prompts[index];
-      speak(p.text, p.lang);
-      // Wait for audio to end or timeout
-      const checkEnd = setInterval(() => {
-        if (!ttsAudio || ttsAudio.paused || ttsAudio.ended) {
-          clearInterval(checkEnd);
-          index++;
-          setTimeout(playNext, 300);
-        }
-      }, 300);
-      setTimeout(() => {
-        clearInterval(checkEnd);
-        if (index < prompts.length) {
-          index++;
-          setTimeout(playNext, 300);
-        }
-      }, 5000);
+      speak(p.text, p.lang, () => {
+        index++;
+        setTimeout(playNext, 300);
+      });
     }
     playNext();
   }
@@ -1217,7 +1166,7 @@
     if(speakBtn){
       speakBtn.addEventListener("click", ()=>{
         if(state.speaking){
-          if(ttsAudio) { ttsAudio.pause(); ttsAudio.currentTime = 0; }
+          if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
           state.speaking = false;
           updateSpeechBtn();
           clearLangHighlight();
