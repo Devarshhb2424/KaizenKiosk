@@ -750,10 +750,11 @@
       },
       body: JSON.stringify({
         text: text,
-        language_code: sarvamLang,
+        target_language_code: sarvamLang,
         model: 'bulbul:v3',
         speaker: 'shubh',
-        output_audio_codec: 'mp3'
+        pace: 1,
+        speech_sample_rate: 22050
       })
     })
     .then(res => {
