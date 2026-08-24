@@ -12,19 +12,19 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
-      --bg-outer: #0B1A18;
-      --bg-app: #EAF4F1;
-      --primary: #0F5C56;
-      --primary-dark: #0A403C;
-      --accent: #E8674A;
-      --accent-dark: #C6502F;
+      --bg-outer: #0A141F;
+      --bg-app: #F0F4F8;
+      --primary: #0B4C95;
+      --primary-dark: #07305B;
+      --accent: #D22630;
+      --accent-dark: #9C151C;
       --gold: #D9A441;
-      --ink: #182422;
-      --ink-soft: #4B6560;
+      --ink: #101A24;
+      --ink-soft: #4A5D6E;
       --card: #FFFFFF;
-      --danger: #B3261E;
-      --danger-dark: #7E1913;
-      --line: #D7E6E2;
+      --danger: #D22630;
+      --danger-dark: #9C151C;
+      --line: #D0DCE7;
       --radius-lg: 26px;
       --radius-md: 16px;
       --radius-sm: 10px;
@@ -45,8 +45,8 @@
     body {
       margin: 0;
       background:
-        radial-gradient(circle at 20% 15%, #123B37 0%, transparent 45%),
-        radial-gradient(circle at 85% 80%, #0F2E2A 0%, transparent 40%),
+        radial-gradient(circle at 20% 15%, #1B365D 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, #0F1E36 0%, transparent 40%),
         var(--bg-outer);
       font-family: var(--font-body);
       color: var(--ink);
@@ -66,7 +66,7 @@
     }
 
     .rig-label {
-      color: #8FB3AC;
+      color: #92B2D5;
       font-family: var(--font-display);
       font-size: 12px;
       letter-spacing: .16em;
@@ -77,7 +77,7 @@
     .kiosk {
       width: 400px;
       height: 760px;
-      background: linear-gradient(180deg, #132825, #0C1D1B);
+      background: linear-gradient(180deg, #18283C, #0E1A29);
       border-radius: 44px;
       padding: 14px;
       box-shadow: 0 40px 80px -20px rgba(0, 0, 0, .65), inset 0 0 0 1px rgba(255, 255, 255, .04);
@@ -459,7 +459,7 @@
 
     .key:active,
     .key:focus-visible {
-      background: #E4F0EC;
+      background: #E2EAF2;
       outline: 2px solid var(--primary);
     }
 
@@ -569,7 +569,7 @@
 
     .step-btn:active,
     .step-btn:focus-visible {
-      background: #E4F0EC;
+      background: #E2EAF2;
       outline: 2px solid var(--primary);
     }
 
@@ -848,7 +848,7 @@
       color: #fff;
       position: relative;
       margin-bottom: 16px;
-      background-image: radial-gradient(circle at top left, #14675F, var(--primary) 60%);
+      background-image: radial-gradient(circle at top left, #1C60A8, var(--primary) 60%);
     }
 
     .ticket .tk-label {
@@ -1094,7 +1094,7 @@
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      background: #E4F0EC;
+      background: #E2EAF2;
       color: var(--primary);
       display: flex;
       align-items: center;
@@ -1118,7 +1118,7 @@
     }
 
     .rig-hint {
-      color: #6E8F89;
+      color: #6E8098;
       font-size: 11.5px;
       max-width: 400px;
       text-align: center;
@@ -1670,7 +1670,9 @@
         return `
       <div class="kiosk-header">
         <div class="hospital-id">
-          <div class="hospital-mark">${HOSPITAL_SHORT}</div>
+          <div class="hospital-mark" style="background: none; padding: 0; width: 32px; height: 32px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+            <img src="logo-mark.png" alt="Kaizen Hospital Logo" style="width: 32px; height: 32px; object-fit: contain; border-radius: 6px; display: block;" />
+          </div>
           <div>
             <div class="hospital-name">${HOSPITAL_NAME}</div>
             <div class="hospital-sub clock">${fmtClock()}</div>
@@ -1713,10 +1715,9 @@
       ${header()}
       <div class="body lang-wrap" style="position:relative;">
         ${startPrompt}
-        <div class="lang-hero">
-          <div class="mark">${HOSPITAL_SHORT}</div>
-          <h1>${HOSPITAL_NAME}</h1>
-          <p>Select your language / भाषा चुनें / ભાષા પસંદ કરો</p>
+        <div class="lang-hero" style="margin-bottom: 22px;">
+          <img src="https://www.kaizenhospital.com/wp-content/uploads/2024/05/Kaizen-Hospital-1-1-e1741068113797.webp" alt="Kaizen Hospital Logo" style="max-width: 290px; height: auto; display: block; margin: 0 auto 12px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.06));" />
+          <p style="margin-top: 12px; font-weight: 500; font-size: 0.85rem;">Select your language / भाषा चुनें / ભાષા પસંદ કરો</p>
         </div>
         <div class="process-strip">
           <div class="proc-step"><div class="proc-ic">🌐</div><div class="proc-cap">Language</div></div>
