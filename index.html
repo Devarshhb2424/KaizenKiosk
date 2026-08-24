@@ -1650,9 +1650,11 @@
           lang: "Welcome to Kaizen Hospital. Please select your preferred language.",
           // identify: t("identifyTitle") + ". " + t("identifySubtitle"),
           identify: t("identifyTitle") + ". ",
-          newForm: t("newPatientTitle") + ". " + t("newPatientSubtitle"),
+          // newForm: t("newPatientTitle") + ". " + t("newPatientSubtitle"),
+          newForm: t("newPatientTitle") + ". ",
           welcomeBack: t("welcomeBackTitle") + (state.patient ? ", " + state.patient.name : "") + ".",
-          dept: t("deptTitle") + ". " + t("deptSubtitle"),
+          // dept: t("deptTitle") + ". " + t("deptSubtitle"),
+          dept: t("deptTitle") + ". ",
           emergency: t("emgTitle") + ". " + t("emgBody"),
           token: tk ? (t("tokenTitle") + ". " + t("tokenNumberLabel") + " " + tk.code + ". " + (tk.isCounter ? t("counterLabel") : t("roomLabel")) + " " + tk.roomNo + ", " + tk.floor + ".") : t("tokenTitle")
         };
