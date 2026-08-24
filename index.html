@@ -1,363 +1,1142 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MediQ — Smart Kiosk with Google TTS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&family=Noto+Sans+Gujarati:wght@500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;700&family=Noto+Sans+Gujarati:wght@500;700&display=swap"
+    rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    :root{
-      --bg-outer:#0B1A18;
-      --bg-app:#EAF4F1;
-      --primary:#0F5C56;
-      --primary-dark:#0A403C;
-      --accent:#E8674A;
-      --accent-dark:#C6502F;
-      --gold:#D9A441;
-      --ink:#182422;
-      --ink-soft:#4B6560;
-      --card:#FFFFFF;
-      --danger:#B3261E;
-      --danger-dark:#7E1913;
-      --line:#D7E6E2;
-      --radius-lg:26px;
-      --radius-md:16px;
-      --radius-sm:10px;
-      --font-display:'Poppins',sans-serif;
-      --font-body:'Inter','Noto Sans Devanagari','Noto Sans Gujarati',sans-serif;
+    :root {
+      --bg-outer: #0B1A18;
+      --bg-app: #EAF4F1;
+      --primary: #0F5C56;
+      --primary-dark: #0A403C;
+      --accent: #E8674A;
+      --accent-dark: #C6502F;
+      --gold: #D9A441;
+      --ink: #182422;
+      --ink-soft: #4B6560;
+      --card: #FFFFFF;
+      --danger: #B3261E;
+      --danger-dark: #7E1913;
+      --line: #D7E6E2;
+      --radius-lg: 26px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+      --font-display: 'Poppins', sans-serif;
+      --font-body: 'Inter', 'Noto Sans Devanagari', 'Noto Sans Gujarati', sans-serif;
       --ui-scale: 1;
     }
-    *{box-sizing:border-box;}
-    html,body{height:100%;}
-    body{
-      margin:0;
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
       background:
         radial-gradient(circle at 20% 15%, #123B37 0%, transparent 45%),
         radial-gradient(circle at 85% 80%, #0F2E2A 0%, transparent 40%),
         var(--bg-outer);
-      font-family:var(--font-body);
-      color:var(--ink);
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px 12px;
-      -webkit-font-smoothing:antialiased;
+      font-family: var(--font-body);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 12px;
+      -webkit-font-smoothing: antialiased;
     }
-    .rig{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:14px;
+
+    .rig {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
     }
-    .rig-label{
-      color:#8FB3AC;
-      font-family:var(--font-display);
-      font-size:12px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      opacity:.75;
+
+    .rig-label {
+      color: #8FB3AC;
+      font-family: var(--font-display);
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      opacity: .75;
     }
-    .kiosk{
-      width:400px;
-      height:760px;
-      background:linear-gradient(180deg,#132825,#0C1D1B);
-      border-radius:44px;
-      padding:14px;
-      box-shadow:0 40px 80px -20px rgba(0,0,0,.65), inset 0 0 0 1px rgba(255,255,255,.04);
-      position:relative;
+
+    .kiosk {
+      width: 400px;
+      height: 760px;
+      background: linear-gradient(180deg, #132825, #0C1D1B);
+      border-radius: 44px;
+      padding: 14px;
+      box-shadow: 0 40px 80px -20px rgba(0, 0, 0, .65), inset 0 0 0 1px rgba(255, 255, 255, .04);
+      position: relative;
     }
-    .kiosk::before{
-      content:"";
-      position:absolute;
-      top:30px; left:50%; transform:translateX(-50%);
-      width:70px; height:6px; border-radius:4px;
-      background:rgba(255,255,255,.12);
+
+    .kiosk::before {
+      content: "";
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .12);
     }
-    .screen{
-      width:100%; height:100%;
-      background:var(--bg-app);
-      border-radius:30px;
-      overflow:hidden;
-      position:relative;
-      display:flex;
-      flex-direction:column;
+
+    .screen {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-app);
+      border-radius: 30px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
       font-size: calc(1rem * var(--ui-scale));
     }
+
     /* header */
-    .kiosk-header{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:16px 18px 10px;
-      flex-shrink:0;
+    .kiosk-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px 10px;
+      flex-shrink: 0;
     }
-    .hospital-id{ display:flex; align-items:center; gap:8px; }
-    .hospital-mark{
-      width:30px;height:30px;border-radius:9px;
-      background:var(--primary);
-      display:flex;align-items:center;justify-content:center;
-      color:#fff; font-family:var(--font-display); font-weight:700; font-size:14px;
-    }
-    .hospital-name{ font-family:var(--font-display); font-weight:700; font-size:13.5px; color:var(--primary-dark); line-height:1.1;}
-    .hospital-sub{ font-size:9.5px; color:var(--ink-soft); letter-spacing:.04em; }
-    .header-right{ display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
-    .clock{ font-size:11px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
-    .help-btn{
-      width:32px;height:32px;border-radius:50%;
-      background:#fff; border:1.5px solid var(--line); color:var(--primary);
-      font-family:var(--font-display); font-weight:700; font-size:13px;
-      display:flex; align-items:center;justify-content:center; cursor:pointer;
-      flex-shrink:0;
-    }
-    .help-btn:active, .help-btn:focus-visible{ transform:scale(.94); outline:2px solid var(--primary); }
-    .icon-btn{
-      width:32px;height:32px;border-radius:50%;
-      background:#fff; border:1.5px solid var(--line); color:var(--primary);
-      font-size:14px; display:flex; align-items:center;justify-content:center;
-      cursor:pointer; flex-shrink:0; position:relative;
-    }
-    .icon-btn:active, .icon-btn:focus-visible{ transform:scale(.94); outline:2px solid var(--primary); }
-    .icon-btn.speaking{ background:var(--gold); border-color:var(--gold); color:#fff; }
-    .icon-btn.text-size{ font-family:var(--font-display); font-weight:700; font-size:12px; }
 
-    .steps{ display:flex; gap:5px; padding:0 20px 8px; flex-shrink:0; }
-    .step-dot{ height:4px; flex:1; border-radius:3px; background:#D7E6E2; }
-    .step-dot.done{ background:var(--primary); }
-    .step-dot.active{ background:var(--gold); }
-
-    .body{
-      flex:1; overflow-y:auto; padding:6px 22px 20px;
-      display:flex; flex-direction:column;
+    .hospital-id {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .body::-webkit-scrollbar{ display:none; }
 
-    .eyebrow{ font-family:var(--font-display); font-size:0.7rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); margin:10px 0 6px;}
-    h1.title{ font-family:var(--font-display); font-size:1.4rem; font-weight:700; color:var(--primary-dark); margin:0 0 6px; line-height:1.25;}
-    p.subtitle{ font-size:0.85rem; color:var(--ink-soft); margin:0 0 18px; line-height:1.5;}
-
-    .btn{
-      font-family:var(--font-body); font-weight:600; font-size:0.95rem;
-      border:none; border-radius:var(--radius-md);
-      padding:16px 18px; cursor:pointer; text-align:center;
-      transition:transform .08s ease;
+    .hospital-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
     }
-    .btn:active, .btn:focus-visible{ transform:scale(.97); outline:2px solid var(--primary-dark); }
-    .btn-primary{ background:var(--primary); color:#fff; }
-    .btn-primary:disabled{ background:#B9CFCA; cursor:not-allowed; }
-    .btn-outline{ background:#fff; color:var(--primary); border:1.5px solid var(--primary); }
-    .btn-ghost{ background:transparent; color:var(--ink-soft); font-size:0.85rem; padding:10px; }
-    .btn-danger{ background:var(--danger); color:#fff; }
-    .btn-block{ width:100%; }
+
+    .hospital-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--primary-dark);
+      line-height: 1.1;
+    }
+
+    .hospital-sub {
+      font-size: 9.5px;
+      color: var(--ink-soft);
+      letter-spacing: .04em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .clock {
+      font-size: 11px;
+      color: var(--ink-soft);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .help-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1.5px solid var(--line);
+      color: var(--primary);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .help-btn:active,
+    .help-btn:focus-visible {
+      transform: scale(.94);
+      outline: 2px solid var(--primary);
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1.5px solid var(--line);
+      color: var(--primary);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .icon-btn:active,
+    .icon-btn:focus-visible {
+      transform: scale(.94);
+      outline: 2px solid var(--primary);
+    }
+
+    .icon-btn.speaking {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #fff;
+    }
+
+    .icon-btn.text-size {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .steps {
+      display: flex;
+      gap: 5px;
+      padding: 0 20px 8px;
+      flex-shrink: 0;
+    }
+
+    .step-dot {
+      height: 4px;
+      flex: 1;
+      border-radius: 3px;
+      background: #D7E6E2;
+    }
+
+    .step-dot.done {
+      background: var(--primary);
+    }
+
+    .step-dot.active {
+      background: var(--gold);
+    }
+
+    .body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 22px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .body::-webkit-scrollbar {
+      display: none;
+    }
+
+    .eyebrow {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 10px 0 6px;
+    }
+
+    h1.title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin: 0 0 6px;
+      line-height: 1.25;
+    }
+
+    p.subtitle {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      margin: 0 0 18px;
+      line-height: 1.5;
+    }
+
+    .btn {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      cursor: pointer;
+      text-align: center;
+      transition: transform .08s ease;
+    }
+
+    .btn:active,
+    .btn:focus-visible {
+      transform: scale(.97);
+      outline: 2px solid var(--primary-dark);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:disabled {
+      background: #B9CFCA;
+      cursor: not-allowed;
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink-soft);
+      font-size: 0.85rem;
+      padding: 10px;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .btn-block {
+      width: 100%;
+    }
 
     /* language screen - voice style */
-    .lang-wrap{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:14px; padding-top:10px;}
-    .lang-hero{ text-align:center; margin-bottom:8px; }
-    .lang-hero .mark{ width:56px;height:56px;border-radius:16px;background:var(--primary); margin:0 auto 14px; display:flex;align-items:center;justify-content:center; color:#fff; font-family:var(--font-display); font-weight:800; font-size:24px; }
-    .lang-hero h1{ font-family:var(--font-display); font-size:1.25rem; color:var(--primary-dark); margin:0 0 4px; }
-    .lang-hero p{ font-size:0.8rem; color:var(--ink-soft); margin:0; }
-    .lang-btn{
-      background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-md);
-      padding:18px 20px; display:flex; align-items:center; justify-content:space-between;
-      cursor:pointer; width:100%; text-align:left;
+    .lang-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      padding-top: 10px;
+    }
+
+    .lang-hero {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .lang-hero .mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--primary);
+      margin: 0 auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 24px;
+    }
+
+    .lang-hero h1 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--primary-dark);
+      margin: 0 0 4px;
+    }
+
+    .lang-hero p {
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .lang-btn {
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
       transition: all 0.2s;
     }
+
     .lang-btn.speaking {
       border-color: var(--gold);
       background: #fff3e0;
       transform: scale(1.02);
     }
-    .lang-btn:active, .lang-btn:focus-visible{ transform:scale(.98); border-color:var(--primary); outline:2px solid var(--primary); }
-    .lang-btn .native{ font-family:var(--font-display); font-weight:700; font-size:1.05rem; color:var(--ink); }
-    .lang-btn .eng{ font-size:0.7rem; color:var(--ink-soft); }
-    .lang-btn .arrow{ color:var(--primary); font-size:1.1rem; }
+
+    .lang-btn:active,
+    .lang-btn:focus-visible {
+      transform: scale(.98);
+      border-color: var(--primary);
+      outline: 2px solid var(--primary);
+    }
+
+    .lang-btn .native {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--ink);
+    }
+
+    .lang-btn .eng {
+      font-size: 0.7rem;
+      color: var(--ink-soft);
+    }
+
+    .lang-btn .arrow {
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
 
     /* keypad */
-    .phone-display{
-      background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-md);
-      padding:14px 16px; font-family:var(--font-display); font-size:1.4rem; letter-spacing:.08em;
-      color:var(--ink); margin-bottom:14px; min-height:56px; display:flex; align-items:center;
+    .phone-display {
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      letter-spacing: .08em;
+      color: var(--ink);
+      margin-bottom: 14px;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
     }
-    .phone-display .ph-ph{ color:#B4C6C1; }
-    .keypad{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
-    .key{
-      background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-sm);
-      font-family:var(--font-display); font-size:1.2rem; font-weight:600; color:var(--ink);
-      padding:13px 0; cursor:pointer;
+
+    .phone-display .ph-ph {
+      color: #B4C6C1;
     }
-    .key:active, .key:focus-visible{ background:#E4F0EC; outline:2px solid var(--primary); }
-    .key.fn{ color:var(--accent); font-size:0.9rem; font-weight:700; }
-    .hint-box{
-      background:#FCF3E4; border:1px dashed var(--gold); border-radius:var(--radius-sm);
-      padding:10px 12px; font-size:0.75rem; color:#8A6414; margin-bottom:14px; line-height:1.45;
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .key {
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--ink);
+      padding: 13px 0;
+      cursor: pointer;
+    }
+
+    .key:active,
+    .key:focus-visible {
+      background: #E4F0EC;
+      outline: 2px solid var(--primary);
+    }
+
+    .key.fn {
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .hint-box {
+      background: #FCF3E4;
+      border: 1px dashed var(--gold);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 0.75rem;
+      color: #8A6414;
+      margin-bottom: 14px;
+      line-height: 1.45;
     }
 
     /* form */
-    .field{ margin-bottom:14px; }
-    .field label{ display:block; font-size:0.75rem; font-weight:600; color:var(--ink-soft); margin-bottom:6px; }
-    .field input{
-      width:100%; padding:13px 14px; border-radius:var(--radius-sm); border:1.5px solid var(--line);
-      font-size:0.95rem; font-family:var(--font-body); color:var(--ink); background:#fff;
+    .field {
+      margin-bottom: 14px;
     }
-    .field input:focus{ outline:2px solid var(--primary); border-color:var(--primary); }
-    .pill-row{ display:flex; gap:8px; }
-    .pill{
-      flex:1; text-align:center; padding:12px 4px; border-radius:var(--radius-sm);
-      border:1.5px solid var(--line); background:#fff; font-size:0.8rem; font-weight:600; color:var(--ink-soft); cursor:pointer;
+
+    .field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
     }
-    .pill .pill-ic{ font-size:1.25rem; display:block; margin-bottom:4px; }
-    .pill.sel{ background:var(--primary); border-color:var(--primary); color:#fff; }
-    .pill:focus-visible{ outline:2px solid var(--primary); }
+
+    .field input {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--line);
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .field input:focus {
+      outline: 2px solid var(--primary);
+      border-color: var(--primary);
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pill {
+      flex: 1;
+      text-align: center;
+      padding: 12px 4px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--line);
+      background: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+
+    .pill .pill-ic {
+      font-size: 1.25rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .pill.sel {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .pill:focus-visible {
+      outline: 2px solid var(--primary);
+    }
 
     /* age stepper */
-    .stepper{ display:flex; align-items:center; gap:8px; }
-    .step-btn{
-      width:44px; height:44px; border-radius:12px; border:1.5px solid var(--line); background:#fff;
-      font-family:var(--font-display); font-weight:700; font-size:1.1rem; color:var(--primary);
-      display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .step-btn:active, .step-btn:focus-visible{ background:#E4F0EC; outline:2px solid var(--primary); }
-    .step-btn.big{ font-size:0.9rem; }
-    .step-value{
-      flex:1; text-align:center; background:#fff; border:1.5px solid var(--line); border-radius:12px;
-      font-family:var(--font-display); font-weight:700; font-size:1.5rem; color:var(--ink); padding:10px 0;
+
+    .step-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1.5px solid var(--line);
+      background: #fff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
     }
-    .step-value .unit{ font-family:var(--font-body); font-size:0.7rem; font-weight:500; color:var(--ink-soft); display:block; margin-top:1px; }
 
-    .field-label-row{ display:flex; align-items:center; gap:6px; margin-bottom:6px; }
-    .field-label-row .fic{ font-size:0.9rem; }
+    .step-btn:active,
+    .step-btn:focus-visible {
+      background: #E4F0EC;
+      outline: 2px solid var(--primary);
+    }
 
-    .form-error{
+    .step-btn.big {
+      font-size: 0.9rem;
+    }
+
+    .step-value {
+      flex: 1;
+      text-align: center;
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--ink);
+      padding: 10px 0;
+    }
+
+    .step-value .unit {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+      display: block;
+      margin-top: 1px;
+    }
+
+    .field-label-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .field-label-row .fic {
+      font-size: 0.9rem;
+    }
+
+    .form-error {
       color: var(--danger);
       font-size: 0.8rem;
       font-weight: 600;
       margin-bottom: 10px;
       display: none;
     }
-    .form-error.show{ display: block; }
 
-    .assist-link{
-      display:flex; align-items:center; gap:6px; justify-content:center;
-      background:#F3EEE1; border:1px dashed var(--gold); border-radius:var(--radius-sm);
-      padding:10px 12px; font-size:0.8rem; color:#8A6414; font-weight:600; cursor:pointer; margin-top:2px; margin-bottom:14px;
-      width: 100%; text-align: center;
+    .form-error.show {
+      display: block;
     }
-    .assist-link:focus-visible{ outline:2px solid var(--gold); }
+
+    .assist-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      background: #F3EEE1;
+      border: 1px dashed var(--gold);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      color: #8A6414;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 2px;
+      margin-bottom: 14px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .assist-link:focus-visible {
+      outline: 2px solid var(--gold);
+    }
 
     /* process preview strip */
-    .process-strip{ display:flex; align-items:center; justify-content:center; gap:6px; margin:4px 0 18px; }
-    .proc-step{ display:flex; flex-direction:column; align-items:center; gap:5px; width:64px; }
-    .proc-ic{ width:40px;height:40px;border-radius:50%; background:#fff; border:1.5px solid var(--line); display:flex;align-items:center;justify-content:center; font-size:18px; }
-    .proc-cap{ font-size:0.6rem; color:var(--ink-soft); text-align:center; line-height:1.2; }
-    .proc-arrow{ color:var(--line); font-size:16px; margin-bottom:16px; }
+    .process-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin: 4px 0 18px;
+    }
+
+    .proc-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      width: 64px;
+    }
+
+    .proc-ic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1.5px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .proc-cap {
+      font-size: 0.6rem;
+      color: var(--ink-soft);
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .proc-arrow {
+      color: var(--line);
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
 
     /* welcome back card */
-    .patient-card{
-      background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-lg);
-      padding:20px; text-align:center; margin-bottom:16px;
+    .patient-card {
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
     }
-    .avatar{ width:52px;height:52px;border-radius:50%; background:var(--gold); color:#fff; font-family:var(--font-display); font-weight:700; font-size:20px; display:flex;align-items:center;justify-content:center; margin:0 auto 12px; }
-    .patient-card h2{ font-family:var(--font-display); font-size:1.1rem; margin:0 0 3px; color:var(--primary-dark); }
-    .patient-card .pid{ font-size:0.75rem; color:var(--ink-soft); letter-spacing:.05em; }
-    .patient-meta{ display:flex; justify-content:center; gap:18px; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); }
-    .patient-meta div{ text-align:center; }
-    .patient-meta .v{ font-family:var(--font-display); font-weight:700; font-size:0.9rem; color:var(--ink); }
-    .patient-meta .l{ font-size:0.65rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+    }
+
+    .patient-card h2 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      margin: 0 0 3px;
+      color: var(--primary-dark);
+    }
+
+    .patient-card .pid {
+      font-size: 0.75rem;
+      color: var(--ink-soft);
+      letter-spacing: .05em;
+    }
+
+    .patient-meta {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .patient-meta div {
+      text-align: center;
+    }
+
+    .patient-meta .v {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+
+    .patient-meta .l {
+      font-size: 0.65rem;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
 
     /* dept grid */
-    .dept-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px; }
-    .dept-tile{
-      background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-md);
-      padding:14px 12px; cursor:pointer; display:flex; flex-direction:column; gap:8px;
-      text-align: left; width: 100%;
+    .dept-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 6px;
     }
-    .dept-tile:active, .dept-tile:focus-visible{ transform:scale(.97); outline:2px solid var(--primary); }
-    .dept-tile .ic{ font-size:1.4rem; }
-    .dept-tile .nm{ font-size:0.8rem; font-weight:700; color:var(--ink); line-height:1.25; }
-    .dept-tile.emg{ grid-column:1 / -1; background:#FBEAE8; border-color:#F0B8B2; flex-direction:row; align-items:center; }
-    .dept-tile.emg .nm{ color:var(--danger); }
+
+    .dept-tile {
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+      width: 100%;
+    }
+
+    .dept-tile:active,
+    .dept-tile:focus-visible {
+      transform: scale(.97);
+      outline: 2px solid var(--primary);
+    }
+
+    .dept-tile .ic {
+      font-size: 1.4rem;
+    }
+
+    .dept-tile .nm {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.25;
+    }
+
+    .dept-tile.emg {
+      grid-column: 1 / -1;
+      background: #FBEAE8;
+      border-color: #F0B8B2;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .dept-tile.emg .nm {
+      color: var(--danger);
+    }
 
     /* emergency screen */
-    .emg-screen{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:10px 4px; }
-    .emg-icon{ width:70px;height:70px;border-radius:50%; background:var(--danger); color:#fff; font-size:34px; display:flex;align-items:center;justify-content:center; margin-bottom:18px; }
-    .emg-screen h1{ font-family:var(--font-display); color:var(--danger-dark); font-size:1.2rem; margin:0 0 10px; }
-    .emg-screen p{ font-size:0.85rem; color:var(--ink-soft); line-height:1.55; margin:0 0 22px; }
+    .emg-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px 4px;
+    }
+
+    .emg-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: var(--danger);
+      color: #fff;
+      font-size: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .emg-screen h1 {
+      font-family: var(--font-display);
+      color: var(--danger-dark);
+      font-size: 1.2rem;
+      margin: 0 0 10px;
+    }
+
+    .emg-screen p {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      line-height: 1.55;
+      margin: 0 0 22px;
+    }
 
     /* token / ticket */
-    .ticket{
-      background:var(--primary); border-radius:var(--radius-lg);
-      padding:22px 20px 18px; color:#fff; position:relative; margin-bottom:16px;
-      background-image:radial-gradient(circle at top left, #14675F, var(--primary) 60%);
+    .ticket {
+      background: var(--primary);
+      border-radius: var(--radius-lg);
+      padding: 22px 20px 18px;
+      color: #fff;
+      position: relative;
+      margin-bottom: 16px;
+      background-image: radial-gradient(circle at top left, #14675F, var(--primary) 60%);
     }
-    .ticket .tk-label{ font-size:0.7rem; letter-spacing:.14em; text-transform:uppercase; opacity:.75; margin-bottom:4px; }
-    .ticket .tk-number{ font-family:var(--font-display); font-weight:800; font-size:3.2rem; line-height:1; margin-bottom:6px; }
-    .ticket .tk-dept{ font-size:0.9rem; font-weight:600; opacity:.95; }
-    .perforation{ display:flex; justify-content:space-between; margin:16px -20px 0; position:relative; }
-    .perforation::before{ content:""; position:absolute; left:0; right:0; top:5px; border-top:2px dashed rgba(255,255,255,.35); }
-    .notch{ width:18px;height:18px; border-radius:50%; background:var(--bg-app); }
-    .notch.right{ background:var(--bg-app); }
-    .ticket-stub{ background:rgba(255,255,255,.08); margin:0 -20px -18px; padding:16px 14px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; border-radius:0 0 var(--radius-lg) var(--radius-lg); }
-    .ticket-stub div{ text-align:left; min-width:0; }
-    .ticket-stub .v{ font-family:var(--font-display); font-weight:700; font-size:1rem; overflow-wrap:break-word; word-break:break-word; }
-    .ticket-stub .l{ font-size:0.58rem; opacity:.7; text-transform:uppercase; letter-spacing:.03em; line-height:1.35; overflow-wrap:break-word; word-break:break-word; margin-top:2px; }
-    .action-row{ display:flex; gap:8px; margin-bottom:8px; }
-    .toast{
-      position:absolute; bottom:90px; left:50%; transform:translateX(-50%);
-      background:var(--ink); color:#fff; padding:9px 16px; border-radius:20px; font-size:0.8rem;
-      opacity:0; transition:opacity .25s ease; pointer-events:none; white-space:nowrap;
+
+    .ticket .tk-label {
+      font-size: 0.7rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      opacity: .75;
+      margin-bottom: 4px;
     }
-    .toast.show{ opacity:1; }
 
-    .back-row{ display:flex; align-items:center; gap:6px; padding:2px 0 10px; flex-shrink:0; }
-    .back-btn{ background:none; border:none; color:var(--primary); font-size:0.85rem; font-weight:600; cursor:pointer; padding:4px 2px; display:flex; align-items:center; gap:3px; }
-    .back-btn:focus-visible{ outline:2px solid var(--primary); }
+    .ticket .tk-number {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 3.2rem;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
 
-    .countdown-bar{ height:3px; background:var(--line); border-radius:3px; overflow:hidden; margin-top:8px; }
-    .countdown-fill{ height:100%; background:var(--gold); width:100%; transition:width 1s linear; }
-    .reset-note{ text-align:center; font-size:0.7rem; color:var(--ink-soft); margin-top:8px; }
+    .ticket .tk-dept {
+      font-size: 0.9rem;
+      font-weight: 600;
+      opacity: .95;
+    }
+
+    .perforation {
+      display: flex;
+      justify-content: space-between;
+      margin: 16px -20px 0;
+      position: relative;
+    }
+
+    .perforation::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 5px;
+      border-top: 2px dashed rgba(255, 255, 255, .35);
+    }
+
+    .notch {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bg-app);
+    }
+
+    .notch.right {
+      background: var(--bg-app);
+    }
+
+    .ticket-stub {
+      background: rgba(255, 255, 255, .08);
+      margin: 0 -20px -18px;
+      padding: 16px 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+
+    .ticket-stub div {
+      text-align: left;
+      min-width: 0;
+    }
+
+    .ticket-stub .v {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .ticket-stub .l {
+      font-size: 0.58rem;
+      opacity: .7;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      line-height: 1.35;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      margin-top: 2px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .toast {
+      position: absolute;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: opacity .25s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .back-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 0 10px;
+      flex-shrink: 0;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 2px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .back-btn:focus-visible {
+      outline: 2px solid var(--primary);
+    }
+
+    .countdown-bar {
+      height: 3px;
+      background: var(--line);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .countdown-fill {
+      height: 100%;
+      background: var(--gold);
+      width: 100%;
+      transition: width 1s linear;
+    }
+
+    .reset-note {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--ink-soft);
+      margin-top: 8px;
+    }
 
     /* QR code modal */
-    .qr-modal{
-      position:absolute; inset:0; background:rgba(10,20,18,.55);
-      display:flex; align-items:center; justify-content:center; z-index:60;
-      padding:22px;
+    .qr-modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 20, 18, .55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+      padding: 22px;
     }
-    .qr-card{
-      background:#fff; width:100%; max-width:320px; border-radius:24px;
-      padding:22px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.3);
+
+    .qr-card {
+      background: #fff;
+      width: 100%;
+      max-width: 320px;
+      border-radius: 24px;
+      padding: 22px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .3);
     }
-    .qr-card h3{
-      font-family:var(--font-display); font-size:1.1rem;
-      color:var(--primary-dark); margin:0 0 5px;
+
+    .qr-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--primary-dark);
+      margin: 0 0 5px;
     }
-    .qr-card p{
-      font-size:0.75rem; color:var(--ink-soft); line-height:1.45; margin:0 0 14px;
+
+    .qr-card p {
+      font-size: 0.75rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+      margin: 0 0 14px;
     }
-    #qrCode{
-      display:flex; align-items:center; justify-content:center;
-      background:#fff; padding:10px; margin:0 auto 14px;
+
+    #qrCode {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      padding: 10px;
+      margin: 0 auto 14px;
     }
-    #qrCode img, #qrCode canvas{ max-width:220px; max-height:220px; }
-    
+
+    #qrCode img,
+    #qrCode canvas {
+      max-width: 220px;
+      max-height: 220px;
+    }
+
     /* help modal */
-    .modal-overlay{
-      position:absolute; inset:0; background:rgba(10,20,18,.55);
-      display:flex; align-items:flex-end; justify-content:center; z-index:50;
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 20, 18, .55);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 50;
     }
-    .modal{
-      background:#fff; width:100%; border-radius:24px 24px 0 0; padding:24px 22px 26px;
-      text-align:center; animation:slideup .25s ease;
+
+    .modal {
+      background: #fff;
+      width: 100%;
+      border-radius: 24px 24px 0 0;
+      padding: 24px 22px 26px;
+      text-align: center;
+      animation: slideup .25s ease;
     }
-    @keyframes slideup{ from{ transform:translateY(30px); opacity:0;} to{ transform:translateY(0); opacity:1;} }
-    .modal .pulse{ width:56px;height:56px; border-radius:50%; background:#E4F0EC; color:var(--primary); display:flex;align-items:center;justify-content:center; margin:0 auto 14px; font-size:24px; }
-    .modal h3{ font-family:var(--font-display); font-size:1rem; color:var(--primary-dark); margin:0 0 8px; }
-    .modal p{ font-size:0.8rem; color:var(--ink-soft); line-height:1.5; margin:0 0 18px; }
 
-    .rig-hint{ color:#6E8F89; font-size:11.5px; max-width:400px; text-align:center; line-height:1.5; }
+    @keyframes slideup {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
 
-    @media (max-width:460px){
-      .kiosk{ width:100%; max-width:400px; height:88vh; border-radius:26px; padding:8px;}
-      .screen{ border-radius:18px; }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal .pulse {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #E4F0EC;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 24px;
+    }
+
+    .modal h3 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--primary-dark);
+      margin: 0 0 8px;
+    }
+
+    .modal p {
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      margin: 0 0 18px;
+    }
+
+    .rig-hint {
+      color: #6E8F89;
+      font-size: 11.5px;
+      max-width: 400px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    @media (max-width:460px) {
+      .kiosk {
+        width: 100%;
+        max-width: 400px;
+        height: 88vh;
+        border-radius: 26px;
+        padding: 8px;
+      }
+
+      .screen {
+        border-radius: 18px;
+      }
     }
 
     .voice-controls {
@@ -366,6 +1145,7 @@
       gap: 10px;
       justify-content: center;
     }
+
     .voice-controls button {
       background: none;
       border: none;
@@ -376,16 +1156,18 @@
       text-decoration: underline;
       padding: 4px 8px;
     }
+
     .voice-status {
       font-size: 0.7rem;
       color: var(--ink-soft);
       text-align: center;
       min-height: 1.2rem;
     }
+
     .start-prompt {
       position: absolute;
       inset: 0;
-      background: rgba(10,20,18,.7);
+      background: rgba(10, 20, 18, .7);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -393,6 +1175,7 @@
       border-radius: 30px;
       cursor: pointer;
     }
+
     .start-prompt .inner {
       background: #fff;
       padding: 30px 40px;
@@ -400,18 +1183,21 @@
       text-align: center;
       max-width: 300px;
     }
+
     .start-prompt .inner h2 {
       font-family: var(--font-display);
       color: var(--primary-dark);
       margin: 0 0 8px;
       font-size: 1.2rem;
     }
+
     .start-prompt .inner p {
       color: var(--ink-soft);
       font-size: 0.85rem;
       margin: 0 0 16px;
       line-height: 1.5;
     }
+
     .start-prompt .inner .big-tap {
       font-size: 3rem;
       display: block;
@@ -419,453 +1205,466 @@
     }
   </style>
 </head>
+
 <body>
-<div class="rig">
-  <div class="rig-label">Lobby Kiosk · Google TTS Voice</div>
-  <div class="kiosk">
-    <div class="screen" id="screen"></div>
+  <div class="rig">
+    <div class="rig-label">Lobby Kiosk · Google TTS Voice</div>
+    <div class="kiosk">
+      <div class="screen" id="screen"></div>
+    </div>
+    <div class="rig-hint">Tap a language — Google TTS speaks in English, Hindi, Gujarati.</div>
   </div>
-  <div class="rig-hint">Tap a language — Google TTS speaks in English, Hindi, Gujarati.</div>
-</div>
 
-<script>
-(function(){
-  "use strict";
+  <script>
+    (function () {
+      "use strict";
 
-  const HOSPITAL_NAME = "Kaizen Hospital";
-  const HOSPITAL_SHORT = "KH";
+      const HOSPITAL_NAME = "Kaizen Hospital";
+      const HOSPITAL_SHORT = "KH";
 
-  const T = {
-    en: {
-      identifyEyebrow:"Step 1 of 3", identifyTitle:"Enter your mobile number",
-      identifySubtitle:"We'll check if you're a new or returning patient.",
-      newPatientHint:"New here? Enter any 10-digit number — we'll register you in the next step.",
-      continueBtn:"Continue", backBtn:"Back", clearBtn:"Clear",
-      newPatientEyebrow:"Step 2 of 3", newPatientTitle:"New patient registration",
-      newPatientSubtitle:"Just the basics — the front desk will complete your file.",
-      fieldName:"Full name", fieldAge:"Age", fieldGender:"Gender",
-      genderMale:"Male", genderFemale:"Female", genderOther:"Other",
-      namePh:"e.g. Ramesh Patel", agePh:"e.g. 34",
-      welcomeBackEyebrow:"Step 2 of 3",
-      welcomeBackTitle:"Welcome back",
-      patientIdLabel:"Patient ID", confirmBtn:"Confirm & continue",
-      notMe:"This isn't me",
-      deptEyebrow:"Step 3 of 3", deptTitle:"What brings you in today?", deptSubtitle:"Select a department",
-      emergencyLabel:"Emergency / Serious symptoms", emergencyTag:"Skip the token",
-      emgTitle:"This kiosk is for token generation only",
-      emgBody:"For a medical emergency, please proceed directly to the Emergency Department, or alert any nearby staff member right now. Do not wait for a token.",
-      understandBtn:"Understood — take me there",
-      tokenEyebrow:"You're checked in", tokenTitle:"Your token is ready",
-      tokenNumberLabel:"Token", deptLabel:"Department", roomLabel:"Room", counterLabel:"Counter", waitLabel:"Est. wait", queueLabel:"Ahead of you",
-      minutesUnit:"min", patientsUnit:"patients",
-      printBtn:"Print token", qrBtn:"Show QR code", smsBtn:"Send by SMS", doneBtn:"Done — finish",
-      printedToast:"Sent to printer ✓", smsToast:"SMS sent ✓",
-      helpBtnLabel:"Help", helpModalTitle:"Need assistance?",
-      helpModalBody:"A staff member has been notified and will come to this kiosk shortly.",
-      helpCloseBtn:"Close",
-      resetNote:"Returning to language screen in",
-      startOver:"Start over",
-      nameRequired:"Please enter your name to continue.",
-      ageRequired:"Please set a valid age using the + / − buttons.",
-      genderRequired:"Please select a gender.",
-      assistHint:"Can't type? Tap here to call a staff member over.",
-    },
-    hi: {
-      identifyEyebrow:"चरण 1 / 3", identifyTitle:"अपना मोबाइल नंबर दर्ज करें",
-      identifySubtitle:"हम जांचेंगे कि आप नए मरीज़ हैं या पुराने।",
-      newPatientHint:"नए मरीज़ हैं? कोई भी 10 अंकों का नंबर डालें — अगले चरण में पंजीकरण होगा।",
-      continueBtn:"आगे बढ़ें", backBtn:"वापस", clearBtn:"मिटाएं",
-      newPatientEyebrow:"चरण 2 / 3", newPatientTitle:"नए मरीज़ का पंजीकरण",
-      newPatientSubtitle:"बस बुनियादी जानकारी — बाकी रिसेप्शन पर पूरी होगी।",
-      fieldName:"पूरा नाम", fieldAge:"उम्र", fieldGender:"लिंग",
-      genderMale:"पुरुष", genderFemale:"महिला", genderOther:"अन्य",
-      namePh:"जैसे रमेश पटेल", agePh:"जैसे 34",
-      welcomeBackEyebrow:"चरण 2 / 3",
-      welcomeBackTitle:"वापसी पर स्वागत है",
-      patientIdLabel:"मरीज़ आईडी", confirmBtn:"पुष्टि करें और आगे बढ़ें",
-      notMe:"यह मैं नहीं हूं",
-      deptEyebrow:"चरण 3 / 3", deptTitle:"आज आप किस लिए आए हैं?", deptSubtitle:"एक विभाग चुनें",
-      emergencyLabel:"आपातकाल / गंभीर लक्षण", emergencyTag:"टोकन की जरूरत नहीं",
-      emgTitle:"यह कियोस्क केवल टोकन के लिए है",
-      emgBody:"चिकित्सा आपातकाल की स्थिति में कृपया सीधे इमरजेंसी विभाग जाएं, या तुरंत पास के किसी स्टाफ सदस्य को बताएं। टोकन का इंतज़ार न करें।",
-      understandBtn:"समझ गया — मुझे वहां ले चलें",
-      tokenEyebrow:"आपकी जांच हो गई", tokenTitle:"आपका टोकन तैयार है",
-      tokenNumberLabel:"टोकन", deptLabel:"विभाग", roomLabel:"कमरा", counterLabel:"काउंटर", waitLabel:"अनुमानित प्रतीक्षा", queueLabel:"आपसे पहले",
-      minutesUnit:"मिनट", patientsUnit:"मरीज़",
-      printBtn:"टोकन प्रिंट करें", qrBtn:"QR कोड दिखाएं", smsBtn:"SMS भेजें", doneBtn:"समाप्त",
-      printedToast:"प्रिंटर पर भेजा गया ✓", smsToast:"SMS भेज दिया गया ✓",
-      helpBtnLabel:"सहायता", helpModalTitle:"सहायता चाहिए?",
-      helpModalBody:"स्टाफ सदस्य को सूचित कर दिया गया है, वे जल्द ही इस कियोस्क पर आएंगे।",
-      helpCloseBtn:"बंद करें",
-      resetNote:"भाषा स्क्रीन पर लौट रहे हैं",
-      startOver:"फिर से शुरू करें",
-      nameRequired:"कृपया आगे बढ़ने के लिए अपना नाम दर्ज करें।",
-      ageRequired:"कृपया + / − बटन से अपनी सही उम्र सेट करें।",
-      genderRequired:"कृपया लिंग चुनें।",
-      assistHint:"लिख नहीं सकते? स्टाफ को बुलाने के लिए यहां टैप करें।",
-    },
-    gu: {
-      identifyEyebrow:"પગલું 1/3", identifyTitle:"તમારો મોબાઇલ નંબર દાખલ કરો",
-      identifySubtitle:"અમે ચકાસીશું કે તમે નવા દર્દી છો કે જૂના.",
-      newPatientHint:"નવા છો? કોઈપણ 10 અંકનો નંબર દાખલ કરો — આગળના પગલામાં નોંધણી થશે.",
-      continueBtn:"આગળ વધો", backBtn:"પાછળ", clearBtn:"સાફ કરો",
-      newPatientEyebrow:"પગલું 2/3", newPatientTitle:"નવા દર્દીની નોંધણી",
-      newPatientSubtitle:"ફક્ત પાયાની માહિતી — બાકી રિસેપ્શન પર પૂર્ણ થશે.",
-      fieldName:"પૂરું નામ", fieldAge:"ઉંમર", fieldGender:"લિંગ",
-      genderMale:"પુરુષ", genderFemale:"સ્ત્રી", genderOther:"અન્ય",
-      namePh:"દા.ત. રમેશ પટેલ", agePh:"દા.ત. 34",
-      welcomeBackEyebrow:"પગલું 2/3",
-      welcomeBackTitle:"પાછા સ્વાગત છે",
-      patientIdLabel:"દર્દી આઈડી", confirmBtn:"પુષ્ટિ કરો અને આગળ વધો",
-      notMe:"આ હું નથી",
-      deptEyebrow:"પગલું 3/3", deptTitle:"આજે તમે શા માટે આવ્યા છો?", deptSubtitle:"એક વિભાગ પસંદ કરો",
-      emergencyLabel:"ઇમરજન્સી / ગંભીર લક્ષણો", emergencyTag:"ટોકનની જરૂર નથી",
-      emgTitle:"આ કિઓસ્ક ફક્ત ટોકન માટે છે",
-      emgBody:"તબીબી ઇમરજન્સીના કિસ્સામાં કૃપા કરી સીધા ઇમરજન્સી વિભાગમાં જાઓ, અથવા તરત નજીકના સ્ટાફ સભ્યને જણાવો. ટોકનની રાહ ન જુઓ.",
-      understandBtn:"સમજાઈ ગયું — મને ત્યાં લઈ જાઓ",
-      tokenEyebrow:"તમારી નોંધણી થઈ ગઈ", tokenTitle:"તમારો ટોકન તૈયાર છે",
-      tokenNumberLabel:"ટોકન", deptLabel:"વિભાગ", roomLabel:"રૂમ", counterLabel:"કાઉન્ટર", waitLabel:"અંદાજિત રાહ", queueLabel:"તમારા પહેલા",
-      minutesUnit:"મિનિટ", patientsUnit:"દર્દીઓ",
-      printBtn:"ટોકન પ્રિન્ટ કરો", qrBtn:"QR કોડ બતાવો", smsBtn:"SMS મોકલો", doneBtn:"પૂર્ણ",
-      printedToast:"પ્રિન્ટર પર મોકલાયું ✓", smsToast:"SMS મોકલાયો ✓",
-      helpBtnLabel:"મદદ", helpModalTitle:"મદદ જોઈએ છે?",
-      helpModalBody:"સ્ટાફ સભ્યને જાણ કરવામાં આવી છે, તેઓ ટૂંક સમયમાં આ કિઓસ્ક પર આવશે.",
-      helpCloseBtn:"બંધ કરો",
-      resetNote:"ભાષા સ્ક્રીન પર પાછા જઈ રહ્યા છીએ",
-      startOver:"ફરીથી શરૂ કરો",
-      nameRequired:"કૃપા કરી આગળ વધવા તમારું નામ દાખલ કરો.",
-      ageRequired:"કૃપા કરી + / − બટનથી તમારી સાચી ઉંમર સેટ કરો.",
-      genderRequired:"કૃપા કરી લિંગ પસંદ કરો.",
-      assistHint:"લખી શકતા નથી? સ્ટાફને બોલાવવા અહીં ટેપ કરો.",
-    }
-  };
+      const T = {
+        en: {
+          identifyEyebrow: "Step 1 of 3", identifyTitle: "Enter your mobile number",
+          identifySubtitle: "We'll check if you're a new or returning patient.",
+          newPatientHint: "New here? Enter any 10-digit number — we'll register you in the next step.",
+          continueBtn: "Continue", backBtn: "Back", clearBtn: "Clear",
+          newPatientEyebrow: "Step 2 of 3", newPatientTitle: "New patient registration",
+          newPatientSubtitle: "Just the basics — the front desk will complete your file.",
+          fieldName: "Full name", fieldAge: "Age", fieldGender: "Gender",
+          genderMale: "Male", genderFemale: "Female", genderOther: "Other",
+          namePh: "e.g. Ramesh Patel", agePh: "e.g. 34",
+          welcomeBackEyebrow: "Step 2 of 3",
+          welcomeBackTitle: "Welcome back",
+          patientIdLabel: "Patient ID", confirmBtn: "Confirm & continue",
+          notMe: "This isn't me",
+          deptEyebrow: "Step 3 of 3", deptTitle: "What brings you in today?", deptSubtitle: "Select a department",
+          emergencyLabel: "Emergency / Serious symptoms", emergencyTag: "Skip the token",
+          emgTitle: "This kiosk is for token generation only",
+          emgBody: "For a medical emergency, please proceed directly to the Emergency Department, or alert any nearby staff member right now. Do not wait for a token.",
+          understandBtn: "Understood — take me there",
+          tokenEyebrow: "You're checked in", tokenTitle: "Your token is ready",
+          tokenNumberLabel: "Token", deptLabel: "Department", roomLabel: "Room", counterLabel: "Counter", waitLabel: "Est. wait", queueLabel: "Ahead of you",
+          minutesUnit: "min", patientsUnit: "patients",
+          printBtn: "Print token", qrBtn: "Show QR code", smsBtn: "Send by SMS", doneBtn: "Done — finish",
+          printedToast: "Sent to printer ✓", smsToast: "SMS sent ✓",
+          helpBtnLabel: "Help", helpModalTitle: "Need assistance?",
+          helpModalBody: "A staff member has been notified and will come to this kiosk shortly.",
+          helpCloseBtn: "Close",
+          resetNote: "Returning to language screen in",
+          startOver: "Start over",
+          nameRequired: "Please enter your name to continue.",
+          ageRequired: "Please set a valid age using the + / − buttons.",
+          genderRequired: "Please select a gender.",
+          assistHint: "Can't type? Tap here to call a staff member over.",
+        },
+        hi: {
+          identifyEyebrow: "चरण 1 / 3", identifyTitle: "अपना मोबाइल नंबर दर्ज करें",
+          identifySubtitle: "हम जांचेंगे कि आप नए मरीज़ हैं या पुराने।",
+          newPatientHint: "नए मरीज़ हैं? कोई भी 10 अंकों का नंबर डालें — अगले चरण में पंजीकरण होगा।",
+          continueBtn: "आगे बढ़ें", backBtn: "वापस", clearBtn: "मिटाएं",
+          newPatientEyebrow: "चरण 2 / 3", newPatientTitle: "नए मरीज़ का पंजीकरण",
+          newPatientSubtitle: "बस बुनियादी जानकारी — बाकी रिसेप्शन पर पूरी होगी।",
+          fieldName: "पूरा नाम", fieldAge: "उम्र", fieldGender: "लिंग",
+          genderMale: "पुरुष", genderFemale: "महिला", genderOther: "अन्य",
+          namePh: "जैसे रमेश पटेल", agePh: "जैसे 34",
+          welcomeBackEyebrow: "चरण 2 / 3",
+          welcomeBackTitle: "वापसी पर स्वागत है",
+          patientIdLabel: "मरीज़ आईडी", confirmBtn: "पुष्टि करें और आगे बढ़ें",
+          notMe: "यह मैं नहीं हूं",
+          deptEyebrow: "चरण 3 / 3", deptTitle: "आज आप किस लिए आए हैं?", deptSubtitle: "एक विभाग चुनें",
+          emergencyLabel: "आपातकाल / गंभीर लक्षण", emergencyTag: "टोकन की जरूरत नहीं",
+          emgTitle: "यह कियोस्क केवल टोकन के लिए है",
+          emgBody: "चिकित्सा आपातकाल की स्थिति में कृपया सीधे इमरजेंसी विभाग जाएं, या तुरंत पास के किसी स्टाफ सदस्य को बताएं। टोकन का इंतज़ार न करें।",
+          understandBtn: "समझ गया — मुझे वहां ले चलें",
+          tokenEyebrow: "आपकी जांच हो गई", tokenTitle: "आपका टोकन तैयार है",
+          tokenNumberLabel: "टोकन", deptLabel: "विभाग", roomLabel: "कमरा", counterLabel: "काउंटर", waitLabel: "अनुमानित प्रतीक्षा", queueLabel: "आपसे पहले",
+          minutesUnit: "मिनट", patientsUnit: "मरीज़",
+          printBtn: "टोकन प्रिंट करें", qrBtn: "QR कोड दिखाएं", smsBtn: "SMS भेजें", doneBtn: "समाप्त",
+          printedToast: "प्रिंटर पर भेजा गया ✓", smsToast: "SMS भेज दिया गया ✓",
+          helpBtnLabel: "सहायता", helpModalTitle: "सहायता चाहिए?",
+          helpModalBody: "स्टाफ सदस्य को सूचित कर दिया गया है, वे जल्द ही इस कियोस्क पर आएंगे।",
+          helpCloseBtn: "बंद करें",
+          resetNote: "भाषा स्क्रीन पर लौट रहे हैं",
+          startOver: "फिर से शुरू करें",
+          nameRequired: "कृपया आगे बढ़ने के लिए अपना नाम दर्ज करें।",
+          ageRequired: "कृपया + / − बटन से अपनी सही उम्र सेट करें।",
+          genderRequired: "कृपया लिंग चुनें।",
+          assistHint: "लिख नहीं सकते? स्टाफ को बुलाने के लिए यहां टैप करें।",
+        },
+        gu: {
+          identifyEyebrow: "પગલું 1/3", identifyTitle: "તમારો મોબાઇલ નંબર દાખલ કરો",
+          identifySubtitle: "અમે ચકાસીશું કે તમે નવા દર્દી છો કે જૂના.",
+          newPatientHint: "નવા છો? કોઈપણ 10 અંકનો નંબર દાખલ કરો — આગળના પગલામાં નોંધણી થશે.",
+          continueBtn: "આગળ વધો", backBtn: "પાછળ", clearBtn: "સાફ કરો",
+          newPatientEyebrow: "પગલું 2/3", newPatientTitle: "નવા દર્દીની નોંધણી",
+          newPatientSubtitle: "ફક્ત પાયાની માહિતી — બાકી રિસેપ્શન પર પૂર્ણ થશે.",
+          fieldName: "પૂરું નામ", fieldAge: "ઉંમર", fieldGender: "લિંગ",
+          genderMale: "પુરુષ", genderFemale: "સ્ત્રી", genderOther: "અન્ય",
+          namePh: "દા.ત. રમેશ પટેલ", agePh: "દા.ત. 34",
+          welcomeBackEyebrow: "પગલું 2/3",
+          welcomeBackTitle: "પાછા સ્વાગત છે",
+          patientIdLabel: "દર્દી આઈડી", confirmBtn: "પુષ્ટિ કરો અને આગળ વધો",
+          notMe: "આ હું નથી",
+          deptEyebrow: "પગલું 3/3", deptTitle: "આજે તમે શા માટે આવ્યા છો?", deptSubtitle: "એક વિભાગ પસંદ કરો",
+          emergencyLabel: "ઇમરજન્સી / ગંભીર લક્ષણો", emergencyTag: "ટોકનની જરૂર નથી",
+          emgTitle: "આ કિઓસ્ક ફક્ત ટોકન માટે છે",
+          emgBody: "તબીબી ઇમરજન્સીના કિસ્સામાં કૃપા કરી સીધા ઇમરજન્સી વિભાગમાં જાઓ, અથવા તરત નજીકના સ્ટાફ સભ્યને જણાવો. ટોકનની રાહ ન જુઓ.",
+          understandBtn: "સમજાઈ ગયું — મને ત્યાં લઈ જાઓ",
+          tokenEyebrow: "તમારી નોંધણી થઈ ગઈ", tokenTitle: "તમારો ટોકન તૈયાર છે",
+          tokenNumberLabel: "ટોકન", deptLabel: "વિભાગ", roomLabel: "રૂમ", counterLabel: "કાઉન્ટર", waitLabel: "અંદાજિત રાહ", queueLabel: "તમારા પહેલા",
+          minutesUnit: "મિનિટ", patientsUnit: "દર્દીઓ",
+          printBtn: "ટોકન પ્રિન્ટ કરો", qrBtn: "QR કોડ બતાવો", smsBtn: "SMS મોકલો", doneBtn: "પૂર્ણ",
+          printedToast: "પ્રિન્ટર પર મોકલાયું ✓", smsToast: "SMS મોકલાયો ✓",
+          helpBtnLabel: "મદદ", helpModalTitle: "મદદ જોઈએ છે?",
+          helpModalBody: "સ્ટાફ સભ્યને જાણ કરવામાં આવી છે, તેઓ ટૂંક સમયમાં આ કિઓસ્ક પર આવશે.",
+          helpCloseBtn: "બંધ કરો",
+          resetNote: "ભાષા સ્ક્રીન પર પાછા જઈ રહ્યા છીએ",
+          startOver: "ફરીથી શરૂ કરો",
+          nameRequired: "કૃપા કરી આગળ વધવા તમારું નામ દાખલ કરો.",
+          ageRequired: "કૃપા કરી + / − બટનથી તમારી સાચી ઉંમર સેટ કરો.",
+          genderRequired: "કૃપા કરી લિંગ પસંદ કરો.",
+          assistHint: "લખી શકતા નથી? સ્ટાફને બોલાવવા અહીં ટેપ કરો.",
+        }
+      };
 
-  const FLOOR_LABEL = {
-    en: { ground:"Ground Floor", f1:"Floor 1", f2:"Floor 2" },
-    hi: { ground:"भूतल", f1:"पहली मंज़िल", f2:"दूसरी मंज़िल" },
-    gu: { ground:"ગ્રાઉન્ડ ફ્લોર", f1:"પહેલો માળ", f2:"બીજો માળ" },
-  };
+      const FLOOR_LABEL = {
+        en: { ground: "Ground Floor", f1: "Floor 1", f2: "Floor 2" },
+        hi: { ground: "भूतल", f1: "पहली मंज़िल", f2: "दूसरी मंज़िल" },
+        gu: { ground: "ગ્રાઉન્ડ ફ્લોર", f1: "પહેલો માળ", f2: "બીજો માળ" },
+      };
 
-  const DEPTS_CONFIG = [
-    {id:"gen", ic:"🩺", en:"General Medicine", hi:"सामान्य चिकित्सा", gu:"જનરલ મેડિસિન", prefix:"G", roomNo:"12", floorKey:"f1", baseCounter:14},
-    {id:"ped", ic:"🧸", en:"Pediatrics", hi:"बाल रोग", gu:"બાળરોગ", prefix:"P", roomNo:"5", floorKey:"ground", baseCounter:7},
-    {id:"ortho", ic:"🦴", en:"Orthopedics", hi:"हड्डी रोग", gu:"अस्थि रोग", prefix:"O", roomNo:"21", floorKey:"f2", baseCounter:9},
-    {id:"cardio", ic:"❤️", en:"Cardiology", hi:"हृदय रोग", gu:"હૃદય રોગ", prefix:"C", roomNo:"18", floorKey:"f2", baseCounter:5},
-    {id:"gyn", ic:"👩‍⚕️", en:"Gynecology", hi:"स्त्री रोग", gu:"સ્ત્રી રોગ", prefix:"Y", roomNo:"9", floorKey:"f1", baseCounter:11},
-    {id:"lab", ic:"🧪", en:"Lab & Diagnostics", hi:"जांच व लैब", gu:"લેબ અને તપાસ", prefix:"L", roomNo:"2", floorKey:"ground", baseCounter:22},
-    {id:"pharm", ic:"💊", en:"Pharmacy", hi:"फार्मेसी", gu:"ફાર્મસી", prefix:"F", roomNo:"3", floorKey:"ground", baseCounter:18, isCounter:true},
-  ];
+      const DEPTS_CONFIG = [
+        { id: "gen", ic: "🩺", en: "General Medicine", hi: "सामान्य चिकित्सा", gu: "જનરલ મેડિસિન", prefix: "G", roomNo: "12", floorKey: "f1", baseCounter: 14 },
+        { id: "ped", ic: "🧸", en: "Pediatrics", hi: "बाल रोग", gu: "બાળરોગ", prefix: "P", roomNo: "5", floorKey: "ground", baseCounter: 7 },
+        { id: "ortho", ic: "🦴", en: "Orthopedics", hi: "हड्डी रोग", gu: "अस्थि रोग", prefix: "O", roomNo: "21", floorKey: "f2", baseCounter: 9 },
+        { id: "cardio", ic: "❤️", en: "Cardiology", hi: "हृदय रोग", gu: "હૃદય રોગ", prefix: "C", roomNo: "18", floorKey: "f2", baseCounter: 5 },
+        { id: "gyn", ic: "👩‍⚕️", en: "Gynecology", hi: "स्त्री रोग", gu: "સ્ત્રી રોગ", prefix: "Y", roomNo: "9", floorKey: "f1", baseCounter: 11 },
+        { id: "lab", ic: "🧪", en: "Lab & Diagnostics", hi: "जांच व लैब", gu: "લેબ અને તપાસ", prefix: "L", roomNo: "2", floorKey: "ground", baseCounter: 22 },
+        { id: "pharm", ic: "💊", en: "Pharmacy", hi: "फार्मेसी", gu: "ફાર્મસી", prefix: "F", roomNo: "3", floorKey: "ground", baseCounter: 18, isCounter: true },
+      ];
 
-  const MOCK_DB = {
-    "9876543210": {name:"Ramesh Patel", age:52, gender:"Male", id:"KH-10432"},
-    "9998887776": {name:"Foram Shah", age:29, gender:"Female", id:"KH-10877"},
-    "9123456780": {name:"Aarav Mehta", age:8,  gender:"Male", id:"KH-11290"},
-  };
+      const MOCK_DB = {
+        "9876543210": { name: "Ramesh Patel", age: 52, gender: "Male", id: "KH-10432" },
+        "9998887776": { name: "Foram Shah", age: 29, gender: "Female", id: "KH-10877" },
+        "9123456780": { name: "Aarav Mehta", age: 8, gender: "Male", id: "KH-11290" },
+      };
 
-  let deptCounters = {};
-  function resetDeptCounters(){
-    DEPTS_CONFIG.forEach(d => {
-      deptCounters[d.id] = d.baseCounter;
-    });
-  }
-  resetDeptCounters();
-
-  let state = {
-    lang: "en",
-    screen: "lang",
-    phone: "",
-    isNew: null,
-    patient: null,
-    dept: null,
-    token: null,
-    helpOpen: false,
-    textScaleIdx: 0,
-    speaking: false,
-    qrOpen: false,
-    formError: "",
-    audioUnlocked: false
-  };
-  const TEXT_SCALE_FACTORS = [1, 1.15, 1.3];
-  let resetTimer = null;
-  let resetInterval = null;
-  let sarvamAudio = null;
-  let sarvamApiKey = "";
-
-  function t(key){
-    const v = T[state.lang][key];
-    return v !== undefined ? v : T.en[key];
-  }
-  function el(id){ return document.getElementById(id); }
-  function fmtClock(){
-    const d = new Date();
-    let h = d.getHours(), m = d.getMinutes();
-    const ap = h >= 12 ? "PM" : "AM";
-    h = h % 12; if(h===0) h=12;
-    return h+":"+String(m).padStart(2,"0")+" "+ap;
-  }
-
-  function goto(screen){
-    clearResetTimer();
-    state.screen = screen;
-    state.formError = "";
-    render();
-    if (screen === 'lang') {
-      if (state.audioUnlocked) {
-        setTimeout(() => startLanguageAnnouncement(), 300);
+      let deptCounters = {};
+      function resetDeptCounters() {
+        DEPTS_CONFIG.forEach(d => {
+          deptCounters[d.id] = d.baseCounter;
+        });
       }
-    } else {
-      if (state.audioUnlocked) {
-        announceCurrentScreen();
+      resetDeptCounters();
+
+      let state = {
+        lang: "en",
+        screen: "lang",
+        phone: "",
+        isNew: null,
+        patient: null,
+        dept: null,
+        token: null,
+        helpOpen: false,
+        textScaleIdx: 0,
+        speaking: false,
+        qrOpen: false,
+        formError: "",
+        audioUnlocked: false
+      };
+      const TEXT_SCALE_FACTORS = [1, 1.15, 1.3];
+      let resetTimer = null;
+      let resetInterval = null;
+      let sarvamAudio = null;
+
+      // IMPORTANT:
+      // GitHub Pages is a static site, so never put the Sarvam API key in this file.
+      // Deploy the companion worker.js as a serverless proxy and put its URL here.
+      const SARVAM_TTS_PROXY_URL = "https://kaizenkiosk.devarsh-hackberrysoftech.workers.dev";
+
+      function t(key) {
+        const v = T[state.lang][key];
+        return v !== undefined ? v : T.en[key];
       }
-    }
-  }
+      function el(id) { return document.getElementById(id); }
+      function fmtClock() {
+        const d = new Date();
+        let h = d.getHours(), m = d.getMinutes();
+        const ap = h >= 12 ? "PM" : "AM";
+        h = h % 12; if (h === 0) h = 12;
+        return h + ":" + String(m).padStart(2, "0") + " " + ap;
+      }
 
-  function clearResetTimer(){
-    if(resetTimer){ clearTimeout(resetTimer); resetTimer=null; }
-    if(resetInterval){ clearInterval(resetInterval); resetInterval=null; }
-  }
-
-  function startResetCountdown(seconds, barId, noteId){
-    clearResetTimer();
-    let remaining = seconds;
-    const bar = el(barId), note = el(noteId);
-    resetInterval = setInterval(()=>{
-      remaining -= 1;
-      if(bar) bar.style.width = (remaining/seconds*100)+"%";
-      if(note) note.textContent = t("resetNote")+" "+remaining+"s";
-      if(remaining<=0){
+      function goto(screen) {
         clearResetTimer();
-        resetAll();
+        state.screen = screen;
+        state.formError = "";
+        render();
+        if (screen === 'lang') {
+          if (state.audioUnlocked) {
+            setTimeout(() => startLanguageAnnouncement(), 300);
+          }
+        } else {
+          if (state.audioUnlocked) {
+            announceCurrentScreen();
+          }
+        }
       }
-    },1000);
-  }
 
-  function resetAll(){
-    if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
-    if (sarvamAudio) { sarvamAudio.pause(); sarvamAudio.currentTime = 0; }
-    const keepScale = state.textScaleIdx;
-    const keepUnlock = state.audioUnlocked;
-    state = {
-      lang:"en", screen:"lang", phone:"", isNew:null, patient:null,
-      dept:null, token:null, helpOpen:false, textScaleIdx:keepScale,
-      speaking:false, qrOpen:false, formError:"",
-      audioUnlocked: keepUnlock
-    };
-    render();
-    if (state.audioUnlocked) {
-      setTimeout(() => startLanguageAnnouncement(), 400);
-    }
-  }
-
-  function applyTextScale(){
-    const screenEl = el("screen");
-    if(screenEl){
-      screenEl.style.setProperty('--ui-scale', TEXT_SCALE_FACTORS[state.textScaleIdx]);
-    }
-  }
-
-  // ---- Web Speech API with user gesture unlock ----
-  function unlockAudio() {
-    if (state.audioUnlocked) return;
-    state.audioUnlocked = true;
-    if ('speechSynthesis' in window) {
-      const silent = new SpeechSynthesisUtterance('');
-      window.speechSynthesis.speak(silent);
-      setTimeout(() => startLanguageAnnouncement(), 200);
-    }
-  }
-
-  function speakNative(text, lang, callback) {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
-      
-      const voices = window.speechSynthesis.getVoices();
-      const targetVoice = voices.find(v => v.lang.toLowerCase() === lang.toLowerCase()) ||
-                          voices.find(v => v.lang.toLowerCase().startsWith(lang.toLowerCase().split('-')[0]));
-      if (targetVoice) {
-        utterance.voice = targetVoice;
+      function clearResetTimer() {
+        if (resetTimer) { clearTimeout(resetTimer); resetTimer = null; }
+        if (resetInterval) { clearInterval(resetInterval); resetInterval = null; }
       }
-      
-      utterance.onstart = () => {
+
+      function startResetCountdown(seconds, barId, noteId) {
+        clearResetTimer();
+        let remaining = seconds;
+        const bar = el(barId), note = el(noteId);
+        resetInterval = setInterval(() => {
+          remaining -= 1;
+          if (bar) bar.style.width = (remaining / seconds * 100) + "%";
+          if (note) note.textContent = t("resetNote") + " " + remaining + "s";
+          if (remaining <= 0) {
+            clearResetTimer();
+            resetAll();
+          }
+        }, 1000);
+      }
+
+      function resetAll() {
+        if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
+        if (sarvamAudio) { sarvamAudio.pause(); sarvamAudio.currentTime = 0; }
+        const keepScale = state.textScaleIdx;
+        const keepUnlock = state.audioUnlocked;
+        state = {
+          lang: "en", screen: "lang", phone: "", isNew: null, patient: null,
+          dept: null, token: null, helpOpen: false, textScaleIdx: keepScale,
+          speaking: false, qrOpen: false, formError: "",
+          audioUnlocked: keepUnlock
+        };
+        render();
+        if (state.audioUnlocked) {
+          setTimeout(() => startLanguageAnnouncement(), 400);
+        }
+      }
+
+      function applyTextScale() {
+        const screenEl = el("screen");
+        if (screenEl) {
+          screenEl.style.setProperty('--ui-scale', TEXT_SCALE_FACTORS[state.textScaleIdx]);
+        }
+      }
+
+      // ---- Web Speech API with user gesture unlock ----
+      function unlockAudio() {
+        if (state.audioUnlocked) return;
+        state.audioUnlocked = true;
+        if ('speechSynthesis' in window) {
+          const silent = new SpeechSynthesisUtterance('');
+          window.speechSynthesis.speak(silent);
+          setTimeout(() => startLanguageAnnouncement(), 200);
+        }
+      }
+
+      function speakNative(text, lang, callback) {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = lang;
+
+          const voices = window.speechSynthesis.getVoices();
+          const targetVoice = voices.find(v => v.lang.toLowerCase() === lang.toLowerCase()) ||
+            voices.find(v => v.lang.toLowerCase().startsWith(lang.toLowerCase().split('-')[0]));
+          if (targetVoice) {
+            utterance.voice = targetVoice;
+          }
+
+          utterance.onstart = () => {
+            state.speaking = true;
+            updateSpeechBtn();
+            highlightLangButton(lang);
+          };
+
+          utterance.onend = () => {
+            state.speaking = false;
+            updateSpeechBtn();
+            clearLangHighlight();
+            if (callback) callback();
+          };
+
+          utterance.onerror = () => {
+            state.speaking = false;
+            updateSpeechBtn();
+            clearLangHighlight();
+            if (callback) callback();
+          };
+
+          window.speechSynthesis.speak(utterance);
+        } else {
+          if (callback) callback();
+        }
+      }
+
+      function speak(text, lang, callback) {
+        if (!state.audioUnlocked) {
+          unlockAudio();
+          setTimeout(() => {
+            if (state.audioUnlocked) speak(text, lang, callback);
+          }, 300);
+          return;
+        }
+
+        if (sarvamAudio) {
+          sarvamAudio.pause();
+          sarvamAudio.currentTime = 0;
+          sarvamAudio = null;
+        }
+
+        // Gujarati is generated by Sarvam Bulbul v3.
+        // English/Hindi continue using the browser's native TTS.
+        if (lang !== 'gu-IN' || !SARVAM_TTS_PROXY_URL || SARVAM_TTS_PROXY_URL === "YOUR_SARVAM_TTS_PROXY_URL") {
+          speakNative(text, lang, callback);
+          return;
+        }
+
         state.speaking = true;
         updateSpeechBtn();
         highlightLangButton(lang);
-      };
-      
-      utterance.onend = () => {
-        state.speaking = false;
-        updateSpeechBtn();
-        clearLangHighlight();
-        if (callback) callback();
-      };
-      
-      utterance.onerror = () => {
-        state.speaking = false;
-        updateSpeechBtn();
-        clearLangHighlight();
-        if (callback) callback();
-      };
 
-      window.speechSynthesis.speak(utterance);
-    } else {
-      if (callback) callback();
-    }
-  }
+        fetch(SARVAM_TTS_PROXY_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            text: text,
+            language_code: 'gu-IN'
+          })
+        })
+          .then(async res => {
+            const raw = await res.text();
+            let data = null;
+            try { data = JSON.parse(raw); } catch (_) { }
 
-  function speak(text, lang, callback) {
-    if (!state.audioUnlocked) {
-      unlockAudio();
-      setTimeout(() => {
-        if (state.audioUnlocked) {
-          speak(text, lang, callback);
+            if (!res.ok) {
+              const message = data?.error?.message || data?.message || raw || ("HTTP " + res.status);
+              throw new Error("Sarvam proxy " + res.status + ": " + message);
+            }
+
+            if (!data?.audios?.[0]) {
+              throw new Error("Sarvam returned no audio");
+            }
+
+            return data.audios[0];
+          })
+          .then(base64Audio => {
+            // Sarvam REST returns base64 audio. The proxy keeps the response JSON
+            // unchanged, so the browser can play the MP3 directly.
+            const audioSrc = "data:audio/mpeg;base64," + base64Audio;
+
+            sarvamAudio = new Audio();
+            sarvamAudio.preload = "auto";
+            sarvamAudio.src = audioSrc;
+
+            sarvamAudio.onplay = () => {
+              state.speaking = true;
+              updateSpeechBtn();
+              highlightLangButton(lang);
+            };
+
+            sarvamAudio.onended = () => {
+              state.speaking = false;
+              updateSpeechBtn();
+              clearLangHighlight();
+              if (callback) callback();
+            };
+
+            sarvamAudio.onerror = (e) => {
+              console.error("Sarvam audio decode/playback error:", e);
+              state.speaking = false;
+              updateSpeechBtn();
+              clearLangHighlight();
+              if (callback) callback();
+            };
+
+            return sarvamAudio.play();
+          })
+          .catch(err => {
+            console.error("Gujarati Sarvam TTS failed:", err);
+            state.speaking = false;
+            updateSpeechBtn();
+            clearLangHighlight();
+
+            // Keep the kiosk usable if Sarvam is temporarily unavailable.
+            speakNative(text, lang, callback);
+          });
+      }
+
+      function highlightLangButton(lang) {
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('speaking'));
+        const map = { 'en-US': 'btn-en', 'hi-IN': 'btn-hi', 'gu-IN': 'btn-gu' };
+        const id = map[lang];
+        if (id) document.getElementById(id)?.classList.add('speaking');
+      }
+
+      function clearLangHighlight() {
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('speaking'));
+      }
+
+      function updateSpeechBtn() {
+        const btn = document.querySelector('[data-action="speak"]');
+        if (btn) {
+          if (state.speaking) btn.classList.add("speaking");
+          else btn.classList.remove("speaking");
         }
-      }, 300);
-      return;
-    }
-
-    if (sarvamAudio) {
-      sarvamAudio.pause();
-      sarvamAudio.currentTime = 0;
-    }
-
-    // Only use Sarvam AI for Gujarati (gu-IN). Fall back to native Web Speech API for English and Hindi.
-    if (lang !== 'gu-IN' || !sarvamApiKey || sarvamApiKey === "YOUR_SARVAM_API_KEY") {
-      speakNative(text, lang, callback);
-      return;
-    }
-
-    const sarvamLang = 'gu-IN';
-    
-    state.speaking = true;
-    updateSpeechBtn();
-    highlightLangButton(lang);
-
-    fetch('https://api.sarvam.ai/text-to-speech', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'api-subscription-key': sarvamApiKey
-      },
-      body: JSON.stringify({
-        text: text,
-        target_language_code: sarvamLang,
-        model: 'bulbul:v3',
-        speaker: 'shubh',
-        pace: 1,
-        speech_sample_rate: 22050,
-        output_audio_codec: 'mp3'
-      })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error("HTTP error " + res.status);
-      return res.json();
-    })
-    .then(data => {
-      if (data && data.audios && data.audios[0]) {
-        const audioSrc = "data:audio/mp3;base64," + data.audios[0];
-        sarvamAudio = new Audio(audioSrc);
-        
-        sarvamAudio.onplay = () => {
-          state.speaking = true;
-          updateSpeechBtn();
-          highlightLangButton(lang);
-        };
-        
-        sarvamAudio.onended = () => {
-          state.speaking = false;
-          updateSpeechBtn();
-          clearLangHighlight();
-          if (callback) callback();
-        };
-        
-        sarvamAudio.onerror = () => {
-          state.speaking = false;
-          updateSpeechBtn();
-          clearLangHighlight();
-          if (callback) callback();
-        };
-        
-        sarvamAudio.play().catch(e => {
-          console.error("Error playing Sarvam audio:", e);
-          speakNative(text, lang, callback);
-        });
-      } else {
-        throw new Error("No audio data returned");
       }
-    })
-    .catch(err => {
-      console.error("Sarvam API request failed:", err);
-      speakNative(text, lang, callback);
-    });
-  }
 
-  function highlightLangButton(lang) {
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('speaking'));
-    const map = { 'en-US': 'btn-en', 'hi-IN': 'btn-hi', 'gu-IN': 'btn-gu' };
-    const id = map[lang];
-    if (id) document.getElementById(id)?.classList.add('speaking');
-  }
-
-  function clearLangHighlight() {
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('speaking'));
-  }
-
-  function updateSpeechBtn(){
-    const btn = document.querySelector('[data-action="speak"]');
-    if(btn){
-      if(state.speaking) btn.classList.add("speaking");
-      else btn.classList.remove("speaking");
-    }
-  }
-
-  function startLanguageAnnouncement() {
-    if (!state.audioUnlocked) return;
-    const prompts = [
-      { text: 'Select your language', lang: 'en-US' },
-      { text: 'अपनी भाषा चुनें', lang: 'hi-IN' },
-      { text: 'તમારી ભાષા પસંદ કરો', lang: 'gu-IN' }
-    ];
-    let index = 0;
-    function playNext() {
-      if (index >= prompts.length) {
-        state.speaking = false;
-        updateSpeechBtn();
-        clearLangHighlight();
-        return;
+      function startLanguageAnnouncement() {
+        if (!state.audioUnlocked) return;
+        const prompts = [
+          { text: 'Select your language', lang: 'en-US' },
+          { text: 'अपनी भाषा चुनें', lang: 'hi-IN' },
+          { text: 'તમારી ભાષા પસંદ કરો', lang: 'gu-IN' }
+        ];
+        let index = 0;
+        function playNext() {
+          if (index >= prompts.length) {
+            state.speaking = false;
+            updateSpeechBtn();
+            clearLangHighlight();
+            return;
+          }
+          const p = prompts[index];
+          speak(p.text, p.lang, () => {
+            index++;
+            setTimeout(playNext, 300);
+          });
+        }
+        playNext();
       }
-      const p = prompts[index];
-      speak(p.text, p.lang, () => {
-        index++;
-        setTimeout(playNext, 300);
-      });
-    }
-    playNext();
-  }
 
-  function announceCurrentScreen(){
-    if (!state.audioUnlocked) return;
-    const tk = state.token;
-    const data = {
-      lang: "Welcome to Kaizen Hospital. Please select your preferred language.",
-      identify: t("identifyTitle") + ". " + t("identifySubtitle"),
-      newForm: t("newPatientTitle") + ". " + t("newPatientSubtitle"),
-      welcomeBack: t("welcomeBackTitle") + (state.patient ? ", " + state.patient.name : "") + ".",
-      dept: t("deptTitle") + ". " + t("deptSubtitle"),
-      emergency: t("emgTitle") + ". " + t("emgBody"),
-      token: tk ? (t("tokenTitle") + ". " + t("tokenNumberLabel") + " " + tk.code + ". " + (tk.isCounter ? t("counterLabel") : t("roomLabel")) + " " + tk.roomNo + ", " + tk.floor + ".") : t("tokenTitle")
-    };
-    const textToSpeak = data[state.screen] || "";
-    if (textToSpeak && state.screen !== 'lang') {
-      const langMap = { en: 'en-US', hi: 'hi-IN', gu: 'gu-IN' };
-      speak(textToSpeak, langMap[state.lang] || 'en-US');
-    }
-  }
+      function announceCurrentScreen() {
+        if (!state.audioUnlocked) return;
+        const tk = state.token;
+        const data = {
+          lang: "Welcome to Kaizen Hospital. Please select your preferred language.",
+          identify: t("identifyTitle") + ". " + t("identifySubtitle"),
+          newForm: t("newPatientTitle") + ". " + t("newPatientSubtitle"),
+          welcomeBack: t("welcomeBackTitle") + (state.patient ? ", " + state.patient.name : "") + ".",
+          dept: t("deptTitle") + ". " + t("deptSubtitle"),
+          emergency: t("emgTitle") + ". " + t("emgBody"),
+          token: tk ? (t("tokenTitle") + ". " + t("tokenNumberLabel") + " " + tk.code + ". " + (tk.isCounter ? t("counterLabel") : t("roomLabel")) + " " + tk.roomNo + ", " + tk.floor + ".") : t("tokenTitle")
+        };
+        const textToSpeak = data[state.screen] || "";
+        if (textToSpeak && state.screen !== 'lang') {
+          const langMap = { en: 'en-US', hi: 'hi-IN', gu: 'gu-IN' };
+          speak(textToSpeak, langMap[state.lang] || 'en-US');
+        }
+      }
 
-  // ---- header ----
-  function header(showHelp){
-    return `
+      // ---- header ----
+      function header(showHelp) {
+        return `
       <div class="kiosk-header">
         <div class="hospital-id">
           <div class="hospital-mark">${HOSPITAL_SHORT}</div>
@@ -875,29 +1674,29 @@
           </div>
         </div>
         <div class="header-right">
-          <button class="icon-btn ${state.speaking?'speaking':''}" data-action="speak" title="Listen to text" aria-label="Audio announcement">🔊</button>
+          <button class="icon-btn ${state.speaking ? 'speaking' : ''}" data-action="speak" title="Listen to text" aria-label="Audio announcement">🔊</button>
           <button class="icon-btn text-size" data-action="text-size" title="Change text size" aria-label="Adjust font size">Aa</button>
           ${showHelp !== false ? `<button class="help-btn" data-action="help" aria-label="Get Help">?</button>` : ""}
         </div>
       </div>`;
-  }
+      }
 
-  function steps(activeIdx, total){
-    let dots = "";
-    for(let i=0;i<total;i++){
-      let cls = "step-dot";
-      if(i < activeIdx) cls += " done";
-      else if(i === activeIdx) cls += " active";
-      dots += `<div class="${cls}"></div>`;
-    }
-    return `<div class="steps">${dots}</div>`;
-  }
+      function steps(activeIdx, total) {
+        let dots = "";
+        for (let i = 0; i < total; i++) {
+          let cls = "step-dot";
+          if (i < activeIdx) cls += " done";
+          else if (i === activeIdx) cls += " active";
+          dots += `<div class="${cls}"></div>`;
+        }
+        return `<div class="steps">${dots}</div>`;
+      }
 
-  // ---- LANGUAGE SCREEN with start prompt ----
-  function screenLang(){
-    let startPrompt = '';
-    if (!state.audioUnlocked) {
-      startPrompt = `
+      // ---- LANGUAGE SCREEN with start prompt ----
+      function screenLang() {
+        let startPrompt = '';
+        if (!state.audioUnlocked) {
+          startPrompt = `
         <div class="start-prompt" data-action="unlock-audio">
           <div class="inner">
             <span class="big-tap">👆</span>
@@ -906,8 +1705,8 @@
           </div>
         </div>
       `;
-    }
-    return `
+        }
+        return `
       ${header()}
       <div class="body lang-wrap" style="position:relative;">
         ${startPrompt}
@@ -940,60 +1739,60 @@
         </div>
         <div class="voice-status" id="voiceStatus"></div>
       </div>`;
-  }
+      }
 
-  window.replayAnnouncement = function() {
-    if (!state.audioUnlocked) {
-      unlockAudio();
-      return;
-    }
-    if (state.screen === 'lang') {
-      startLanguageAnnouncement();
-    } else {
-      announceCurrentScreen();
-    }
-  };
+      window.replayAnnouncement = function () {
+        if (!state.audioUnlocked) {
+          unlockAudio();
+          return;
+        }
+        if (state.screen === 'lang') {
+          startLanguageAnnouncement();
+        } else {
+          announceCurrentScreen();
+        }
+      };
 
-  // ---- other screens ----
-  function screenIdentify(){
-    const digits = state.phone;
-    const displayDigits = digits.padEnd(10,"•").split("").map((c,i)=> i<digits.length? `<span>${c}</span>` : `<span class="ph-ph">${c}</span>`).join("");
-    return `
+      // ---- other screens ----
+      function screenIdentify() {
+        const digits = state.phone;
+        const displayDigits = digits.padEnd(10, "•").split("").map((c, i) => i < digits.length ? `<span>${c}</span>` : `<span class="ph-ph">${c}</span>`).join("");
+        return `
       ${header()}
-      ${steps(0,3)}
+      ${steps(0, 3)}
       <div class="body">
         <div class="eyebrow">${t("identifyEyebrow")}</div>
         <h1 class="title">${t("identifyTitle")}</h1>
         <p class="subtitle">${t("identifySubtitle")}</p>
         <div class="phone-display" aria-label="Entered phone number ${digits}">${displayDigits}</div>
         <div class="keypad" id="keypad">
-          ${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="key" data-key="${n}">${n}</button>`).join("")}
+          ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button class="key" data-key="${n}">${n}</button>`).join("")}
           <button class="key fn" data-key="clear">${t("clearBtn")}</button>
           <button class="key" data-key="0">0</button>
           <button class="key fn" data-key="back">⌫</button>
         </div>
         <div class="hint-box">${t("newPatientHint")}</div>
-        <button class="btn btn-primary btn-block" id="idContinue" ${digits.length!==10?"disabled":""}>${t("continueBtn")}</button>
+        <button class="btn btn-primary btn-block" id="idContinue" ${digits.length !== 10 ? "disabled" : ""}>${t("continueBtn")}</button>
         <div class="back-row">
           <button class="back-btn" data-action="back-to-lang">‹ ${t("backBtn")}</button>
         </div>
       </div>`;
-  }
+      }
 
-  function screenNewPatientForm(){
-    const p = state.patient || {name:"",age:25,gender:""};
-    const currentAge = (p.age === undefined || p.age === null || p.age === 0) ? 25 : p.age;
-    return `
+      function screenNewPatientForm() {
+        const p = state.patient || { name: "", age: 25, gender: "" };
+        const currentAge = (p.age === undefined || p.age === null || p.age === 0) ? 25 : p.age;
+        return `
       ${header()}
-      ${steps(1,3)}
+      ${steps(1, 3)}
       <div class="body">
         <div class="eyebrow">${t("newPatientEyebrow")}</div>
         <h1 class="title">${t("newPatientTitle")}</h1>
         <p class="subtitle">${t("newPatientSubtitle")}</p>
-        <div class="form-error ${state.formError?'show':''}" id="formError">${state.formError}</div>
+        <div class="form-error ${state.formError ? 'show' : ''}" id="formError">${state.formError}</div>
         <div class="field">
           <div class="field-label-row"><span class="fic">👤</span><label style="margin:0" for="fName">${t("fieldName")}</label></div>
-          <input type="text" id="fName" placeholder="${t("namePh")}" value="${p.name||""}">
+          <input type="text" id="fName" placeholder="${t("namePh")}" value="${p.name || ""}">
         </div>
         <button class="assist-link" data-action="help">🙋 <span>${t("assistHint")}</span></button>
         <div class="field">
@@ -1009,9 +1808,9 @@
         <div class="field">
           <div class="field-label-row"><span class="fic">⚧</span><label style="margin:0">${t("fieldGender")}</label></div>
           <div class="pill-row" id="genderRow">
-            <button class="pill ${p.gender==='Male'?'sel':''}" data-gender="Male"><span class="pill-ic">👨</span>${t("genderMale")}</button>
-            <button class="pill ${p.gender==='Female'?'sel':''}" data-gender="Female"><span class="pill-ic">👩</span>${t("genderFemale")}</button>
-            <button class="pill ${p.gender==='Other'?'sel':''}" data-gender="Other"><span class="pill-ic">🧑</span>${t("genderOther")}</button>
+            <button class="pill ${p.gender === 'Male' ? 'sel' : ''}" data-gender="Male"><span class="pill-ic">👨</span>${t("genderMale")}</button>
+            <button class="pill ${p.gender === 'Female' ? 'sel' : ''}" data-gender="Female"><span class="pill-ic">👩</span>${t("genderFemale")}</button>
+            <button class="pill ${p.gender === 'Other' ? 'sel' : ''}" data-gender="Other"><span class="pill-ic">🧑</span>${t("genderOther")}</button>
           </div>
         </div>
         <button class="btn btn-primary btn-block" id="formContinue">${t("continueBtn")}</button>
@@ -1019,14 +1818,14 @@
           <button class="back-btn" data-action="back-to-identify">‹ ${t("backBtn")}</button>
         </div>
       </div>`;
-  }
+      }
 
-  function screenWelcomeBack(){
-    const p = state.patient;
-    const initials = p.name ? p.name.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase() : "P";
-    return `
+      function screenWelcomeBack() {
+        const p = state.patient;
+        const initials = p.name ? p.name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() : "P";
+        return `
       ${header()}
-      ${steps(1,3)}
+      ${steps(1, 3)}
       <div class="body">
         <div class="eyebrow">${t("welcomeBackEyebrow")}</div>
         <h1 class="title">${t("welcomeBackTitle")}</h1>
@@ -1044,17 +1843,17 @@
           <button class="back-btn" data-action="not-me">‹ ${t("notMe")}</button>
         </div>
       </div>`;
-  }
+      }
 
-  function screenDept(){
-    const tiles = DEPTS_CONFIG.map(d=>`
+      function screenDept() {
+        const tiles = DEPTS_CONFIG.map(d => `
       <button class="dept-tile" data-dept="${d.id}">
         <div class="ic">${d.ic}</div>
-        <div class="nm">${d[state.lang]||d.en}</div>
+        <div class="nm">${d[state.lang] || d.en}</div>
       </button>`).join("");
-    return `
+        return `
       ${header()}
-      ${steps(2,3)}
+      ${steps(2, 3)}
       <div class="body">
         <div class="eyebrow">${t("deptEyebrow")}</div>
         <h1 class="title">${t("deptTitle")}</h1>
@@ -1070,10 +1869,10 @@
           <button class="back-btn" data-action="back-to-identify">‹ ${t("backBtn")}</button>
         </div>
       </div>`;
-  }
+      }
 
-  function screenEmergency(){
-    return `
+      function screenEmergency() {
+        return `
       ${header(false)}
       <div class="body">
         <div class="emg-screen">
@@ -1083,11 +1882,11 @@
           <button class="btn btn-danger btn-block" data-action="emg-ack">${t("understandBtn")}</button>
         </div>
       </div>`;
-  }
+      }
 
-  function screenToken(){
-    const tk = state.token;
-    return `
+      function screenToken() {
+        const tk = state.token;
+        return `
       ${header(false)}
       <div class="body" style="position:relative;">
         <div class="eyebrow">${t("tokenEyebrow")}</div>
@@ -1112,11 +1911,11 @@
         <div class="reset-note" id="cdNote">${t("resetNote")} 20s</div>
         <div class="toast" id="toast"></div>
       </div>`;
-  }
+      }
 
-  function helpModalHTML(){
-    if(!state.helpOpen) return "";
-    return `
+      function helpModalHTML() {
+        if (!state.helpOpen) return "";
+        return `
       <div class="modal-overlay" data-action="close-help-overlay">
         <div class="modal" onclick="event.stopPropagation()">
           <div class="pulse">📣</div>
@@ -1125,12 +1924,12 @@
           <button class="btn btn-primary btn-block" data-action="close-help">${t("helpCloseBtn")}</button>
         </div>
       </div>`;
-  }
+      }
 
-  function qrModalHTML(){
-    if(!state.qrOpen || !state.token) return "";
-    const tk = state.token;
-    return `
+      function qrModalHTML() {
+        if (!state.qrOpen || !state.token) return "";
+        const tk = state.token;
+        return `
       <div class="qr-modal" data-action="close-qr-overlay">
         <div class="qr-card" onclick="event.stopPropagation()">
           <h3>${t("qrBtn")}</h3>
@@ -1139,316 +1938,300 @@
           <button class="btn btn-primary btn-block" data-action="close-qr">${t("helpCloseBtn")}</button>
         </div>
       </div>`;
-  }
-
-  function generateFallbackQR(container, text) {
-    const encoded = encodeURIComponent(text);
-    container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encoded}" alt="QR Code" style="max-width:200px; height:auto;" onerror="this.onerror=null; this.parentNode.innerHTML='<div style=\'padding:20px;background:#f5f5f5;border-radius:12px;font-size:12px;color:#666;\'>Token: ${state.token ? state.token.code : ''}</div>';" />`;
-  }
-
-  function renderQRCode(){
-    const container = el("qrCode");
-    if(!container || !state.token) return;
-    const tk = state.token;
-    const payloadStr = JSON.stringify({
-      hospital: HOSPITAL_NAME,
-      patient: state.patient ? state.patient.name : "",
-      patientId: state.patient ? state.patient.id : "",
-      token: tk.code,
-      department: tk.deptName,
-      location: (tk.isCounter ? "Counter " : "Room ") + tk.roomNo,
-      floor: tk.floor,
-      estimatedWaitMinutes: tk.wait,
-      ahead: tk.ahead
-    });
-    if(typeof QRCode !== "undefined"){
-      try {
-        new QRCode(container, {
-          text: payloadStr,
-          width: 200,
-          height: 200,
-          correctLevel: QRCode.CorrectLevel.M
-        });
-        return;
-      } catch(e) {}
-    }
-    generateFallbackQR(container, payloadStr);
-  }
-
-  function render(){
-    let html = "";
-    switch(state.screen){
-      case "lang": html = screenLang(); break;
-      case "identify": html = screenIdentify(); break;
-      case "newForm": html = screenNewPatientForm(); break;
-      case "welcomeBack": html = screenWelcomeBack(); break;
-      case "dept": html = screenDept(); break;
-      case "emergency": html = screenEmergency(); break;
-      case "token": html = screenToken(); break;
-      default: html = screenLang();
-    }
-    html += helpModalHTML();
-    html += qrModalHTML();
-    el("screen").innerHTML = html;
-    attachHandlers();
-    applyTextScale();
-    if(state.screen === "token"){
-      startResetCountdown(20, "cdFill", "cdNote");
-    }
-    if(state.qrOpen) renderQRCode();
-  }
-
-  function attachHandlers(){
-    const root = el("screen");
-
-    // Unlock audio on any click on the screen
-    root.addEventListener('click', function unlockOnClick(e) {
-      if (!state.audioUnlocked) {
-        unlockAudio();
-        // Remove the start prompt after unlock
-        const prompt = root.querySelector('.start-prompt');
-        if (prompt) prompt.remove();
       }
-    }, { once: true });
 
-    // Also handle the unlock action specifically
-    const unlockBtn = root.querySelector('[data-action="unlock-audio"]');
-    if (unlockBtn) {
-      unlockBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        unlockAudio();
-        const prompt = root.querySelector('.start-prompt');
-        if (prompt) prompt.remove();
-      });
-    }
+      function generateFallbackQR(container, text) {
+        const encoded = encodeURIComponent(text);
+        container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encoded}" alt="QR Code" style="max-width:200px; height:auto;" onerror="this.onerror=null; this.parentNode.innerHTML='<div style=\'padding:20px;background:#f5f5f5;border-radius:12px;font-size:12px;color:#666;\'>Token: ${state.token ? state.token.code : ''}</div>';" />`;
+      }
 
-    root.querySelectorAll("[data-lang]").forEach(node=>{
-      node.addEventListener("click", (e)=>{
-        e.stopPropagation();
-        if (!state.audioUnlocked) {
-          unlockAudio();
-          setTimeout(() => {
+      function renderQRCode() {
+        const container = el("qrCode");
+        if (!container || !state.token) return;
+        const tk = state.token;
+        const payloadStr = JSON.stringify({
+          hospital: HOSPITAL_NAME,
+          patient: state.patient ? state.patient.name : "",
+          patientId: state.patient ? state.patient.id : "",
+          token: tk.code,
+          department: tk.deptName,
+          location: (tk.isCounter ? "Counter " : "Room ") + tk.roomNo,
+          floor: tk.floor,
+          estimatedWaitMinutes: tk.wait,
+          ahead: tk.ahead
+        });
+        if (typeof QRCode !== "undefined") {
+          try {
+            new QRCode(container, {
+              text: payloadStr,
+              width: 200,
+              height: 200,
+              correctLevel: QRCode.CorrectLevel.M
+            });
+            return;
+          } catch (e) { }
+        }
+        generateFallbackQR(container, payloadStr);
+      }
+
+      function render() {
+        let html = "";
+        switch (state.screen) {
+          case "lang": html = screenLang(); break;
+          case "identify": html = screenIdentify(); break;
+          case "newForm": html = screenNewPatientForm(); break;
+          case "welcomeBack": html = screenWelcomeBack(); break;
+          case "dept": html = screenDept(); break;
+          case "emergency": html = screenEmergency(); break;
+          case "token": html = screenToken(); break;
+          default: html = screenLang();
+        }
+        html += helpModalHTML();
+        html += qrModalHTML();
+        el("screen").innerHTML = html;
+        attachHandlers();
+        applyTextScale();
+        if (state.screen === "token") {
+          startResetCountdown(20, "cdFill", "cdNote");
+        }
+        if (state.qrOpen) renderQRCode();
+      }
+
+      function attachHandlers() {
+        const root = el("screen");
+
+        // Unlock audio on any click on the screen
+        root.addEventListener('click', function unlockOnClick(e) {
+          if (!state.audioUnlocked) {
+            unlockAudio();
+            // Remove the start prompt after unlock
+            const prompt = root.querySelector('.start-prompt');
+            if (prompt) prompt.remove();
+          }
+        }, { once: true });
+
+        // Also handle the unlock action specifically
+        const unlockBtn = root.querySelector('[data-action="unlock-audio"]');
+        if (unlockBtn) {
+          unlockBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            unlockAudio();
+            const prompt = root.querySelector('.start-prompt');
+            if (prompt) prompt.remove();
+          });
+        }
+
+        root.querySelectorAll("[data-lang]").forEach(node => {
+          node.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (!state.audioUnlocked) {
+              unlockAudio();
+              setTimeout(() => {
+                const lang = node.getAttribute("data-lang");
+                state.lang = lang;
+                const msgMap = { en: 'You selected English', hi: 'आपने हिन्दी चुनी', gu: 'તમે ગુજરાતી પસંદ કરી' };
+                const langMap = { en: 'en-US', hi: 'hi-IN', gu: 'gu-IN' };
+                speak(msgMap[lang], langMap[lang]);
+                goto("identify");
+              }, 300);
+              return;
+            }
             const lang = node.getAttribute("data-lang");
             state.lang = lang;
             const msgMap = { en: 'You selected English', hi: 'आपने हिन्दी चुनी', gu: 'તમે ગુજરાતી પસંદ કરી' };
             const langMap = { en: 'en-US', hi: 'hi-IN', gu: 'gu-IN' };
             speak(msgMap[lang], langMap[lang]);
             goto("identify");
-          }, 300);
-          return;
+          });
+        });
+
+        root.querySelectorAll('[data-action="help"]').forEach(node => {
+          node.addEventListener("click", () => { state.helpOpen = true; render(); });
+        });
+        const speakBtn = root.querySelector('[data-action="speak"]');
+        if (speakBtn) {
+          speakBtn.addEventListener("click", () => {
+            if (state.speaking) {
+              if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
+              if (sarvamAudio) { sarvamAudio.pause(); sarvamAudio.currentTime = 0; }
+              state.speaking = false;
+              updateSpeechBtn();
+              clearLangHighlight();
+            } else {
+              if (state.screen === 'lang') startLanguageAnnouncement();
+              else announceCurrentScreen();
+            }
+          });
         }
-        const lang = node.getAttribute("data-lang");
-        state.lang = lang;
-        const msgMap = { en: 'You selected English', hi: 'आपने हिन्दी चुनी', gu: 'તમે ગુજરાતી પસંદ કરી' };
-        const langMap = { en: 'en-US', hi: 'hi-IN', gu: 'gu-IN' };
-        speak(msgMap[lang], langMap[lang]);
-        goto("identify");
-      });
-    });
+        const textSizeBtn = root.querySelector('[data-action="text-size"]');
+        if (textSizeBtn) textSizeBtn.addEventListener("click", () => {
+          state.textScaleIdx = (state.textScaleIdx + 1) % TEXT_SCALE_FACTORS.length;
+          applyTextScale();
+        });
+        const closeHelp = root.querySelector('[data-action="close-help"]');
+        if (closeHelp) closeHelp.addEventListener("click", () => { state.helpOpen = false; render(); });
+        const closeHelpOverlay = root.querySelector('[data-action="close-help-overlay"]');
+        if (closeHelpOverlay) closeHelpOverlay.addEventListener("click", () => { state.helpOpen = false; render(); });
 
-    root.querySelectorAll('[data-action="help"]').forEach(node=>{
-      node.addEventListener("click", ()=>{ state.helpOpen = true; render(); });
-    });
-    const speakBtn = root.querySelector('[data-action="speak"]');
-    if(speakBtn){
-      speakBtn.addEventListener("click", ()=>{
-        if(state.speaking){
-          if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
-          if (sarvamAudio) { sarvamAudio.pause(); sarvamAudio.currentTime = 0; }
-          state.speaking = false;
-          updateSpeechBtn();
-          clearLangHighlight();
-        } else {
-          if (state.screen === 'lang') startLanguageAnnouncement();
-          else announceCurrentScreen();
+        root.querySelectorAll("[data-key]").forEach(node => {
+          node.addEventListener("click", () => {
+            const k = node.getAttribute("data-key");
+            if (k === "clear") { state.phone = ""; }
+            else if (k === "back") { state.phone = state.phone.slice(0, -1); }
+            else if (state.phone.length < 10) { state.phone += k; }
+            render();
+          });
+        });
+        const idContinue = root.querySelector("#idContinue");
+        if (idContinue) idContinue.addEventListener("click", () => {
+          if (state.phone.length !== 10) return;
+          const found = MOCK_DB[state.phone];
+          if (found) {
+            state.isNew = false;
+            state.patient = { ...found };
+            goto("welcomeBack");
+          } else {
+            state.isNew = true;
+            state.patient = { name: "", age: 25, gender: "" };
+            goto("newForm");
+          }
+        });
+        const backToLang = root.querySelector('[data-action="back-to-lang"]');
+        if (backToLang) backToLang.addEventListener("click", () => goto("lang"));
+
+        const fNameInput = root.querySelector("#fName");
+        if (fNameInput) {
+          fNameInput.addEventListener("input", (e) => {
+            if (state.patient) state.patient.name = e.target.value;
+          });
         }
-      });
-    }
-    const textSizeBtn = root.querySelector('[data-action="text-size"]');
-    if(textSizeBtn) textSizeBtn.addEventListener("click", ()=>{
-      state.textScaleIdx = (state.textScaleIdx + 1) % TEXT_SCALE_FACTORS.length;
-      applyTextScale();
-    });
-    const closeHelp = root.querySelector('[data-action="close-help"]');
-    if(closeHelp) closeHelp.addEventListener("click", ()=>{ state.helpOpen = false; render(); });
-    const closeHelpOverlay = root.querySelector('[data-action="close-help-overlay"]');
-    if(closeHelpOverlay) closeHelpOverlay.addEventListener("click", ()=>{ state.helpOpen = false; render(); });
 
-    root.querySelectorAll("[data-key]").forEach(node=>{
-      node.addEventListener("click", ()=>{
-        const k = node.getAttribute("data-key");
-        if(k==="clear"){ state.phone = ""; }
-        else if(k==="back"){ state.phone = state.phone.slice(0,-1); }
-        else if(state.phone.length < 10){ state.phone += k; }
-        render();
-      });
-    });
-    const idContinue = root.querySelector("#idContinue");
-    if(idContinue) idContinue.addEventListener("click", ()=>{
-      if(state.phone.length !== 10) return;
-      const found = MOCK_DB[state.phone];
-      if(found){
-        state.isNew = false;
-        state.patient = {...found};
-        goto("welcomeBack");
-      } else {
-        state.isNew = true;
-        state.patient = {name:"", age:25, gender:""};
-        goto("newForm");
-      }
-    });
-    const backToLang = root.querySelector('[data-action="back-to-lang"]');
-    if(backToLang) backToLang.addEventListener("click", ()=> goto("lang"));
+        root.querySelectorAll("[data-age-step]").forEach(node => {
+          node.addEventListener("click", () => {
+            const delta = parseInt(node.getAttribute("data-age-step"), 10);
+            let current = parseInt(state.patient.age, 10);
+            if (isNaN(current) || current <= 0) current = 25;
+            current = Math.max(1, Math.min(120, current + delta));
+            state.patient.age = current;
+            const ageValueEl = el("ageValue");
+            if (ageValueEl) ageValueEl.innerHTML = current + '<span class="unit">' + t("fieldAge") + '</span>';
+          });
+        });
 
-    const fNameInput = root.querySelector("#fName");
-    if(fNameInput) {
-      fNameInput.addEventListener("input", (e)=>{
-        if(state.patient) state.patient.name = e.target.value;
-      });
-    }
+        const genderRow = root.querySelector("#genderRow");
+        if (genderRow) {
+          genderRow.querySelectorAll("[data-gender]").forEach(node => {
+            node.addEventListener("click", () => {
+              state.patient.gender = node.getAttribute("data-gender");
+              render();
+            });
+          });
+        }
+        const formContinue = root.querySelector("#formContinue");
+        if (formContinue) formContinue.addEventListener("click", () => {
+          const name = el("fName") ? el("fName").value.trim() : "";
+          const age = Number(state.patient.age) || 0;
+          if (!name) {
+            state.formError = t("nameRequired");
+            render();
+            return;
+          }
+          if (age <= 0 || age > 120) {
+            state.formError = t("ageRequired");
+            render();
+            return;
+          }
+          if (!state.patient.gender) {
+            state.formError = t("genderRequired");
+            render();
+            return;
+          }
+          state.patient.name = name;
+          state.patient.id = "KH-" + Math.floor(10000 + Math.random() * 89999);
+          goto("dept");
+        });
+        const backToIdentify = root.querySelector('[data-action="back-to-identify"]');
+        if (backToIdentify) backToIdentify.addEventListener("click", () => goto("identify"));
 
-    root.querySelectorAll("[data-age-step]").forEach(node=>{
-      node.addEventListener("click", ()=>{
-        const delta = parseInt(node.getAttribute("data-age-step"), 10);
-        let current = parseInt(state.patient.age, 10);
-        if(isNaN(current) || current <= 0) current = 25;
-        current = Math.max(1, Math.min(120, current + delta));
-        state.patient.age = current;
-        const ageValueEl = el("ageValue");
-        if(ageValueEl) ageValueEl.innerHTML = current + '<span class="unit">' + t("fieldAge") + '</span>';
-      });
-    });
+        const wbConfirm = root.querySelector("#wbConfirm");
+        if (wbConfirm) wbConfirm.addEventListener("click", () => goto("dept"));
+        const notMe = root.querySelector('[data-action="not-me"]');
+        if (notMe) notMe.addEventListener("click", () => {
+          state.isNew = true;
+          state.patient = { name: "", age: 25, gender: "" };
+          goto("newForm");
+        });
 
-    const genderRow = root.querySelector("#genderRow");
-    if(genderRow){
-      genderRow.querySelectorAll("[data-gender]").forEach(node=>{
-        node.addEventListener("click", ()=>{
-          state.patient.gender = node.getAttribute("data-gender");
+        root.querySelectorAll("[data-dept]").forEach(node => {
+          node.addEventListener("click", () => {
+            const id = node.getAttribute("data-dept");
+            if (id === "EMERGENCY") { goto("emergency"); return; }
+            const deptConfig = DEPTS_CONFIG.find(d => d.id === id);
+            deptCounters[id] = (deptCounters[id] || deptConfig.baseCounter) + 1;
+            const currentCounter = deptCounters[id];
+            const ahead = Math.max(0, currentCounter % 7 + 1);
+            state.dept = deptConfig;
+            state.token = {
+              code: deptConfig.prefix + "-" + String(currentCounter).padStart(3, "0"),
+              deptName: deptConfig[state.lang] || deptConfig.en,
+              roomNo: deptConfig.roomNo,
+              isCounter: !!deptConfig.isCounter,
+              floor: FLOOR_LABEL[state.lang][deptConfig.floorKey],
+              wait: ahead * 5,
+              ahead: ahead,
+            };
+            goto("token");
+          });
+        });
+
+        const emgAck = root.querySelector('[data-action="emg-ack"]');
+        if (emgAck) emgAck.addEventListener("click", () => goto("dept"));
+
+        const qrBtn = root.querySelector('[data-action="qr"]');
+        if (qrBtn) qrBtn.addEventListener("click", () => {
+          state.qrOpen = true;
           render();
         });
-      });
-    }
-    const formContinue = root.querySelector("#formContinue");
-    if(formContinue) formContinue.addEventListener("click", ()=>{
-      const name = el("fName") ? el("fName").value.trim() : "";
-      const age = Number(state.patient.age) || 0;
-      if(!name){
-        state.formError = t("nameRequired");
-        render();
-        return;
+        const closeQr = root.querySelector('[data-action="close-qr"]');
+        if (closeQr) closeQr.addEventListener("click", () => {
+          state.qrOpen = false;
+          render();
+        });
+        const closeQrOverlay = root.querySelector('[data-action="close-qr-overlay"]');
+        if (closeQrOverlay) closeQrOverlay.addEventListener("click", () => {
+          state.qrOpen = false;
+          render();
+        });
+        const smsBtn = root.querySelector('[data-action="sms"]');
+        if (smsBtn) smsBtn.addEventListener("click", () => showToast(t("smsToast")));
+        const doneBtn = root.querySelector('[data-action="done"]');
+        if (doneBtn) doneBtn.addEventListener("click", () => resetAll());
       }
-      if(age <= 0 || age > 120){
-        state.formError = t("ageRequired");
-        render();
-        return;
+
+      function showToast(msg) {
+        const toast = el("toast");
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1600);
       }
-      if(!state.patient.gender){
-        state.formError = t("genderRequired");
+
+      setInterval(() => {
+        const clockNodes = document.querySelectorAll(".clock");
+        const currentTime = fmtClock();
+        clockNodes.forEach(node => { node.textContent = currentTime; });
+      }, 5000);
+
+      // Expose unlock for debugging
+      window.unlockAudio = unlockAudio;
+
+      function init() {
         render();
-        return;
       }
-      state.patient.name = name;
-      state.patient.id = "KH-" + Math.floor(10000 + Math.random()*89999);
-      goto("dept");
-    });
-    const backToIdentify = root.querySelector('[data-action="back-to-identify"]');
-    if(backToIdentify) backToIdentify.addEventListener("click", ()=> goto("identify"));
 
-    const wbConfirm = root.querySelector("#wbConfirm");
-    if(wbConfirm) wbConfirm.addEventListener("click", ()=> goto("dept"));
-    const notMe = root.querySelector('[data-action="not-me"]');
-    if(notMe) notMe.addEventListener("click", ()=>{
-      state.isNew = true;
-      state.patient = {name:"", age:25, gender:""};
-      goto("newForm");
-    });
-
-    root.querySelectorAll("[data-dept]").forEach(node=>{
-      node.addEventListener("click", ()=>{
-        const id = node.getAttribute("data-dept");
-        if(id === "EMERGENCY"){ goto("emergency"); return; }
-        const deptConfig = DEPTS_CONFIG.find(d=>d.id===id);
-        deptCounters[id] = (deptCounters[id] || deptConfig.baseCounter) + 1;
-        const currentCounter = deptCounters[id];
-        const ahead = Math.max(0, currentCounter % 7 + 1);
-        state.dept = deptConfig;
-        state.token = {
-          code: deptConfig.prefix + "-" + String(currentCounter).padStart(3,"0"),
-          deptName: deptConfig[state.lang] || deptConfig.en,
-          roomNo: deptConfig.roomNo,
-          isCounter: !!deptConfig.isCounter,
-          floor: FLOOR_LABEL[state.lang][deptConfig.floorKey],
-          wait: ahead * 5,
-          ahead: ahead,
-        };
-        goto("token");
-      });
-    });
-
-    const emgAck = root.querySelector('[data-action="emg-ack"]');
-    if(emgAck) emgAck.addEventListener("click", ()=> goto("dept"));
-
-    const qrBtn = root.querySelector('[data-action="qr"]');
-    if(qrBtn) qrBtn.addEventListener("click", ()=>{
-      state.qrOpen = true;
-      render();
-    });
-    const closeQr = root.querySelector('[data-action="close-qr"]');
-    if(closeQr) closeQr.addEventListener("click", ()=>{
-      state.qrOpen = false;
-      render();
-    });
-    const closeQrOverlay = root.querySelector('[data-action="close-qr-overlay"]');
-    if(closeQrOverlay) closeQrOverlay.addEventListener("click", ()=>{
-      state.qrOpen = false;
-      render();
-    });
-    const smsBtn = root.querySelector('[data-action="sms"]');
-    if(smsBtn) smsBtn.addEventListener("click", ()=> showToast(t("smsToast")));
-    const doneBtn = root.querySelector('[data-action="done"]');
-    if(doneBtn) doneBtn.addEventListener("click", ()=> resetAll());
-  }
-
-  function showToast(msg){
-    const toast = el("toast");
-    if(!toast) return;
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(()=> toast.classList.remove("show"), 1600);
-  }
-
-  setInterval(()=>{
-    const clockNodes = document.querySelectorAll(".clock");
-    const currentTime = fmtClock();
-    clockNodes.forEach(node => { node.textContent = currentTime; });
-  }, 5000);
-
-  async function loadEnv() {
-    try {
-      const res = await fetch('.env');
-      if (!res.ok) return;
-      const text = await res.text();
-      text.split('\n').forEach(line => {
-        const parts = line.split('=');
-        if (parts[0] && parts[0].trim() === 'SARVAM_API_KEY') {
-          sarvamApiKey = parts.slice(1).join('=').trim().replace(/^["']|["']$/g, '');
-        }
-      });
-    } catch (e) {
-      console.warn("Could not load .env file:", e);
-    }
-  }
-
-  // Expose unlock for debugging
-  window.unlockAudio = unlockAudio;
-
-  async function init() {
-    await loadEnv();
-    render();
-  }
-
-  init();
-})();
-</script>
+      init();
+    })();
+  </script>
 </body>
+
 </html>
