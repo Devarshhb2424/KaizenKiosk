@@ -2035,7 +2035,7 @@
                 state.lang = lang;
                 const msgMap = { en: 'You selected English', hi: 'आपने हिन्दी चुनी', gu: 'તમે ગુજરાતી પસંદ કરી' };
                 const langMap = { en: 'en-US', hi: 'hi-IN', gu: 'gu-IN' };
-                speak(msgMap[lang], langMap[lang]);
+                // speak(msgMap[lang], langMap[lang]);
                 goto("identify");
               }, 300);
               return;
@@ -2044,7 +2044,7 @@
             state.lang = lang;
             const msgMap = { en: 'You selected English', hi: 'आपने हिन्दी चुनी', gu: 'તમે ગુજરાતી પસંદ કરી' };
             const langMap = { en: 'en-US', hi: 'hi-IN', gu: 'gu-IN' };
-            speak(msgMap[lang], langMap[lang]);
+            // speak(msgMap[lang], langMap[lang]);
             goto("identify");
           });
         });
