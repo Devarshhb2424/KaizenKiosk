@@ -730,12 +730,13 @@
       sarvamAudio.currentTime = 0;
     }
 
-    if (!sarvamApiKey || sarvamApiKey === "YOUR_SARVAM_API_KEY") {
+    // Only use Sarvam AI for Gujarati (gu-IN). Fall back to native Web Speech API for English and Hindi.
+    if (lang !== 'gu-IN' || !sarvamApiKey || sarvamApiKey === "YOUR_SARVAM_API_KEY") {
       speakNative(text, lang, callback);
       return;
     }
 
-    const sarvamLang = lang === 'en-US' ? 'en-IN' : (lang === 'hi-IN' ? 'hi-IN' : 'gu-IN');
+    const sarvamLang = 'gu-IN';
     
     state.speaking = true;
     updateSpeechBtn();
