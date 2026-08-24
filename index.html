@@ -588,6 +588,8 @@
   const TEXT_SCALE_FACTORS = [1, 1.15, 1.3];
   let resetTimer = null;
   let resetInterval = null;
+  let sarvamAudio = null;
+  let sarvamApiKey = "";
 
   function t(key){
     const v = T[state.lang][key];
@@ -640,6 +642,7 @@
 
   function resetAll(){
     if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
+    if (sarvamAudio) { sarvamAudio.pause(); sarvamAudio.currentTime = 0; }
     const keepScale = state.textScaleIdx;
     const keepUnlock = state.audioUnlocked;
     state = {
@@ -672,23 +675,12 @@
     }
   }
 
-  function speak(text, lang, callback) {
-    if (!state.audioUnlocked) {
-      unlockAudio();
-      setTimeout(() => {
-        if (state.audioUnlocked) {
-          speak(text, lang, callback);
-        }
-      }, 300);
-      return;
-    }
-
+  function speakNative(text, lang, callback) {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
       
-      // Find the best matching voice for the target language (especially Chrome cloud voices)
       const voices = window.speechSynthesis.getVoices();
       const targetVoice = voices.find(v => v.lang.toLowerCase() === lang.toLowerCase()) ||
                           voices.find(v => v.lang.toLowerCase().startsWith(lang.toLowerCase().split('-')[0]));
@@ -720,6 +712,90 @@
     } else {
       if (callback) callback();
     }
+  }
+
+  function speak(text, lang, callback) {
+    if (!state.audioUnlocked) {
+      unlockAudio();
+      setTimeout(() => {
+        if (state.audioUnlocked) {
+          speak(text, lang, callback);
+        }
+      }, 300);
+      return;
+    }
+
+    if (sarvamAudio) {
+      sarvamAudio.pause();
+      sarvamAudio.currentTime = 0;
+    }
+
+    if (!sarvamApiKey || sarvamApiKey === "YOUR_SARVAM_API_KEY") {
+      speakNative(text, lang, callback);
+      return;
+    }
+
+    const sarvamLang = lang === 'en-US' ? 'en-IN' : (lang === 'hi-IN' ? 'hi-IN' : 'gu-IN');
+    
+    state.speaking = true;
+    updateSpeechBtn();
+    highlightLangButton(lang);
+
+    fetch('https://api.sarvam.ai/text-to-speech', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-subscription-key': sarvamApiKey
+      },
+      body: JSON.stringify({
+        text: text,
+        language_code: sarvamLang,
+        model: 'bulbul:v3',
+        speaker: 'shubh',
+        output_audio_codec: 'mp3'
+      })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("HTTP error " + res.status);
+      return res.json();
+    })
+    .then(data => {
+      if (data && data.audios && data.audios[0]) {
+        const audioSrc = "data:audio/mp3;base64," + data.audios[0];
+        sarvamAudio = new Audio(audioSrc);
+        
+        sarvamAudio.onplay = () => {
+          state.speaking = true;
+          updateSpeechBtn();
+          highlightLangButton(lang);
+        };
+        
+        sarvamAudio.onended = () => {
+          state.speaking = false;
+          updateSpeechBtn();
+          clearLangHighlight();
+          if (callback) callback();
+        };
+        
+        sarvamAudio.onerror = () => {
+          state.speaking = false;
+          updateSpeechBtn();
+          clearLangHighlight();
+          if (callback) callback();
+        };
+        
+        sarvamAudio.play().catch(e => {
+          console.error("Error playing Sarvam audio:", e);
+          speakNative(text, lang, callback);
+        });
+      } else {
+        throw new Error("No audio data returned");
+      }
+    })
+    .catch(err => {
+      console.error("Sarvam API request failed:", err);
+      speakNative(text, lang, callback);
+    });
   }
 
   function highlightLangButton(lang) {
@@ -1175,6 +1251,7 @@
       speakBtn.addEventListener("click", ()=>{
         if(state.speaking){
           if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); }
+          if (sarvamAudio) { sarvamAudio.pause(); sarvamAudio.currentTime = 0; }
           state.speaking = false;
           updateSpeechBtn();
           clearLangHighlight();
@@ -1343,13 +1420,29 @@
     clockNodes.forEach(node => { node.textContent = currentTime; });
   }, 5000);
 
-  function init() {
-    render();
-    // Don't auto-start voice — wait for user click
+  async function loadEnv() {
+    try {
+      const res = await fetch('.env');
+      if (!res.ok) return;
+      const text = await res.text();
+      text.split('\n').forEach(line => {
+        const parts = line.split('=');
+        if (parts[0] && parts[0].trim() === 'SARVAM_API_KEY') {
+          sarvamApiKey = parts.slice(1).join('=').trim().replace(/^["']|["']$/g, '');
+        }
+      });
+    } catch (e) {
+      console.warn("Could not load .env file:", e);
+    }
   }
 
   // Expose unlock for debugging
   window.unlockAudio = unlockAudio;
+
+  async function init() {
+    await loadEnv();
+    render();
+  }
 
   init();
 })();
