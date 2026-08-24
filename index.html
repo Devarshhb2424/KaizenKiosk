@@ -688,6 +688,14 @@
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
       
+      // Find the best matching voice for the target language (especially Chrome cloud voices)
+      const voices = window.speechSynthesis.getVoices();
+      const targetVoice = voices.find(v => v.lang.toLowerCase() === lang.toLowerCase()) ||
+                          voices.find(v => v.lang.toLowerCase().startsWith(lang.toLowerCase().split('-')[0]));
+      if (targetVoice) {
+        utterance.voice = targetVoice;
+      }
+      
       utterance.onstart = () => {
         state.speaking = true;
         updateSpeechBtn();
